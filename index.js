@@ -23,7 +23,7 @@ mongoose
   });
 
 app.get('/', (req, res) => {
-  res.end('this is working fine');
+  res.end('Welcome to EMS software');
 });
 // app.post('/register/admin', authController.signup);
 const port = process.env.PORT || 3000;
