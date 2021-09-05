@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
-const User = require("./../models/userModel");
-const bcrypt = require("bcryptjs");
+const jwt = require('jsonwebtoken');
+const User = require('./../models/userModel');
+const bcrypt = require('bcryptjs');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -9,15 +9,15 @@ const signToken = (id) => {
 };
 
 const checkActivationToken = (role, token) => {
-  if (role === "admin" && process.env.ACTIVATION_TOKENS.includes(token)) {
+  if (role === 'admin' && process.env.ACTIVATION_TOKENS.includes(token)) {
     return token;
-  } else if (role === "admin" && token === undefined) {
-    throw new Error("Please provide the activation token");
+  } else if (role === 'admin' && token === undefined) {
+    throw new Error('Please provide the activation token');
   } else if (
-    role === "admin" &&
+    role === 'admin' &&
     !process.env.ACTIVATION_TOKENS.includes(token)
   ) {
-    throw new Error("Please provide the valid activation token");
+    throw new Error('Please provide the valid activation token');
   } else {
     return undefined;
   }
@@ -51,16 +51,16 @@ exports.signup = async (req, res) => {
     const token = signToken(newUser._id);
 
     res.status(200).json({
-      status: "true",
+      status: 'true',
       token,
-      message: "User successfully created",
+      message: 'User successfully created',
       content: {
         newUser,
       },
     });
   } catch (error) {
     res.status(404).json({
-      status: "false",
+      status: 'false',
       message: error.message,
     });
   }
@@ -72,8 +72,8 @@ exports.login = async (req, res) => {
 
     if (!username || !password) {
       res.status(400).json({
-        status: "false",
-        message: "Please enter username and password",
+        status: 'false',
+        message: 'Please enter username and password',
       });
     }
 
@@ -81,18 +81,18 @@ exports.login = async (req, res) => {
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({
-        status: "false",
-        message: "Invalid Credentials",
+        status: 'false',
+        message: 'Invalid Credentials',
       });
     }
     const token = signToken(user._id);
     res.status(200).json({
-      status: "true",
+      status: 'true',
       token,
     });
   } catch (error) {
     res.status(404).json({
-      status: "false",
+      status: 'false',
       message: error.message,
     });
   }
