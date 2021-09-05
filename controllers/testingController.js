@@ -52,25 +52,28 @@ exports.sendNotification = async (req, res) => {
       title: `${query.name} sent a message`,
       body: `${query.message}`,
     },
-    // data: {
-    //   type: `${query.type}`,
-    //   url: `${query.message}`,
-    //   sendFrom: `${query.name}`,
-    //   timeStamp: `${query.timeStamp}`,
-    // },
+    //     data: {
+    //       type: `${query.type}`,
+    //       url: `${query.message}`,
+    //       sendFrom: `${query.name}`,
+    //       timeStamp: `${query.timeStamp}`,
+    //     },
   };
+  //   let token;
+  //   await Test.findOne(
+  //     { name: new RegExp('^' + `${query.name}` + '$', 'i') },
+  //     async function (err, doc) {
+  //       token = await doc.token;
+  //       console.log(token);
+  //     }
+  //   );
 
-  Test.findOne(
-    { name: new RegExp('^' + `${query.name}` + '$', 'i') },
-    function (err, doc) {
-      console.log(query.name);
-    }
-  );
+  //   console.log(token);
 
-  const user = await Test.findOne(query.name);
-  console.log(`This is user ${user}`);
-  const registrationToken = user.token;
-  console.log(`This is user ${user.token}`);
+  //   const user = await Test.findOne(query.name);
+  //   console.log(`This is user ${user}`);
+  const registrationToken = query.token;
+  //   console.log(`This is user ${user.token}`);
 
   if (registrationToken != null) {
     admin
