@@ -26,16 +26,6 @@ const projectSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
-  //   owner: {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: 'Admin',
-  //   },
-  /*members: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Admin",
-    },
-  ],*/
 });
 
 const Project = mongoose.model('Project', projectSchema);
