@@ -1,5 +1,4 @@
 const Project = require('../models/projectModel');
-// const Admin = require('./../models/adminModel');
 
 exports.createProject = async (req, res) => {
   try {
