@@ -1,11 +1,14 @@
 const express = require('express');
-const testingController = require('./../controllers/testingController');
 const router = express.Router();
+const testingController = require('./../controllers/testingController');
+// var upload = multer({ dest: '/images/' });
 
 router
   .route('/')
   .post(testingController.createToken)
   .get(testingController.getAllTokens);
+
+router.route('/testing').post(testingController.testingMulter);
 
 // router
 //   .route('/savingData')

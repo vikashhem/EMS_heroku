@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const testing = new mongoose.Schema({
   name: String,
   token: String,

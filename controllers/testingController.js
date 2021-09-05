@@ -1,3 +1,5 @@
+const multer = require('multer');
+const sharp = require('sharp');
 const fs = require('fs');
 const url = require('url');
 var admin = require('firebase-admin');
@@ -10,7 +12,12 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const content = 'Some content!';
+exports.testingMulter = (req, res) => {
+  console.log(req.body);
+  res.end('success');
+  // req.file is the `avatar` file
+  // req.body will hold the text fields, if there were any
+};
 
 exports.createToken = async (req, res) => {
   try {
