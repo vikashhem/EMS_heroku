@@ -1,5 +1,3 @@
-const multer = require('multer');
-const sharp = require('sharp');
 const fs = require('fs');
 const url = require('url');
 var admin = require('firebase-admin');
