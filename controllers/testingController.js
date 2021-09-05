@@ -29,12 +29,12 @@ exports.createToken = async (req, res) => {
 };
 exports.getAllTokens = async (req, res) => {
   try {
-    const tokens = await Token.find();
+    const tokens = await Test.find();
     res.send(tokens);
   } catch (error) {
     res.status(404).json({
       status: 'error',
-      message: error,
+      message: error.message,
     });
   }
 };
