@@ -3,18 +3,18 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  name: {
+  fullName: {
     type: String,
-    required: [true, ' Please provide a name'],
+    required: [true, 'Please provide the full name'],
   },
   username: {
     type: String,
-    // unique: true,
-    required: [true, 'Please provide an username'],
+    required: [true, 'Please provide the username'],
+    unique: [true, 'That username has already been taken'],
   },
   email: {
     type: String,
-    unique: true,
+    unique: [true, 'That email is already been used'],
     required: [true, 'Please provide an email address'],
     validate: [validator.isEmail, 'Please provide an valid email'],
   },
@@ -33,57 +33,25 @@ const userSchema = new mongoose.Schema({
       message: 'Password are not the same',
     },
   },
-  role: {
+  designation: {
     type: String,
-    enum: ['user', 'admin'],
-    default: 'user',
+    required: [true, 'Please provide a designation'],
   },
-  activation_token: {
+  teamName: {
     type: String,
+    required: [true, 'Please provide a team name'],
   },
-  phoneNumber: {
-    type: Number,
-    required: [true, 'Please enter the phoneNumber'],
-  },
-  companyName: {
+  projectName: {
     type: String,
-    required: [true, 'Please enter the company name'],
-  },
-  companyDescription: {
-    type: String,
-    required: [true, 'Please specify the company description'],
-  },
-  companyNumber: {
-    type: Number,
-    required: [true, 'Please enter the company number'],
-  },
-  companyEmail: {
-    type: String,
-    required: [true, 'Please enter the company email'],
-    unique: true,
-    validate: [validator.isEmail, 'Please provide an valid email'],
-  },
-  address: {
-    type: String,
-    required: [true, 'Please enter your address'],
-    trim: true,
+    required: [true, 'Please provide a project name'],
   },
 });
-
-// const joiUserSchema = Joi.object({
-//   name: Joi.string().required(),
-//   email: Joi.string().email().lowercase().required(),
-//   password: Joi.string().required(),
-//   passwordConfirm: Joi.any().equal(Joi.ref('password')).required(),
-// });
-
-// var userSchema = new mongoose.Schema(joigoose.convert(joiUserSchema));
 
 userSchema.pre('save', async function (next) {
   //this function only run if password is modified
   if (!this.isModified('password')) return next();
 
-  //hash the password with cost of 16
+  //hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
   next();

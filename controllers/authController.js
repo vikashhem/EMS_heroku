@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('./../models/userModel');
+const Admin = require('../models/adminModel');
 const bcrypt = require('bcryptjs');
 
 const signToken = (id) => {
@@ -25,7 +25,7 @@ const checkActivationToken = (role, token) => {
 
 exports.signup = async (req, res) => {
   try {
-    const newUser = await User.create({
+    const newAdmin = await Admin.create({
       name: req.body.name,
       username: req.body.username,
       email: req.body.email,
@@ -46,21 +46,16 @@ exports.signup = async (req, res) => {
 
     console.log(req.body.activation_token);
 
-    // const newUser = await User.create(req.body);
-
-    const token = signToken(newUser._id);
+    const token = signToken(newAdmin._id);
 
     res.status(200).json({
-      status: 'true',
+      status: true,
       token,
-      message: 'User successfully created',
-      content: {
-        newUser,
-      },
+      message: 'Admin successfully created',
     });
   } catch (error) {
     res.status(404).json({
-      status: 'false',
+      status: false,
       message: error.message,
     });
   }
@@ -77,7 +72,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ username });
+    const user = await Admin.findOne({ username });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({

@@ -1,33 +1,40 @@
-const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const authController = require('./controllers/authController');
+// const express = require('express');
 const app = require('./app');
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
 
-// dotenv.config({ path: './config.env' });
+dotenv.config({ path: './config.env' });
 
-// const DB = process.env.DATABASE.replace(
-//   '<PASSWORD>',
-//   process.env.DATABASE_PASSWORD
-// );
+const DB = process.env.DATABASE.replace(
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
+);
 
-// mongoose
-//   .connect(DB, {
-//     useNewUrlParser: true,
-//     useCreateIndex: true,
-//     useFindAndModify: false,
-//     useUnifiedTopology: true,
-//   })
-//   .then(() => {
-//     console.log('DB connection successfully');
-//   });
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('DB connection successfully');
+  });
 
 app.get('/', (req, res) => {
   res.end('Welcome to EMS software!');
 });
-// app.post('/register/admin', authController.signup);
-const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
+const port = process.env.PORT || 3000;
+io.on('connection', (socket) => {
+  console.log('connected');
+  console.log(socket.id);
+});
+
+server.listen(port, () => {
   console.log(`Server has started at port ${port}`);
 });
+
+module.exports = port;
