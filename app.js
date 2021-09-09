@@ -3,7 +3,6 @@ const express = require('express');
 const app = express();
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
-const tokenRoutes = require('./routes/testingRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 
 app.use(express.json());
@@ -12,7 +11,5 @@ app.use(express.json());
 app.use('/', adminRoutes);
 app.use('/users', userRoutes);
 app.use('/projects', projectRoutes);
-
-app.use('/tokens', tokenRoutes);
 
 module.exports = app;
