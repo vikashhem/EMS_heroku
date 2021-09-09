@@ -14,6 +14,7 @@ exports.createProject = async (req, res) => {
   }
 };
 
+
 exports.getAllProjects = async (req, res) => {
   try {
     const projects = await Project.find();

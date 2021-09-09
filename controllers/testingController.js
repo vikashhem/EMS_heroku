@@ -11,10 +11,27 @@ admin.initializeApp({
 });
 
 exports.testingMulter = (req, res) => {
-  console.log(req.body);
-  res.end('success');
-  // req.file is the `avatar` file
-  // req.body will hold the text fields, if there were any
+  const data = JSON.stringify(req.body);
+  // fs.writeFile('./token.json', data, (err) => {
+  //   if (err) {
+  //     console.log('Error writing file', err);
+  //   } else {
+  //     console.log('Successfully wrote file');
+  //   }
+  //   res.send(req.body);
+  // });
+const data = JSON.stringify(req.body);
+  jsonReader('./customer.json', (err, customer) => {
+    if (err) {
+      console.log('Error reading file:', err);
+      return;
+    }
+    // increase customer order count by 1
+    customer.order_count += 1;
+    fs.writeFile('./customer.json', JSON.stringify(customer), (err) => {
+      if (err) console.log('Error writing file:', err);
+    });
+  });
 };
 
 exports.createToken = async (req, res) => {
@@ -64,19 +81,7 @@ exports.sendNotification = async (req, res) => {
     //       timeStamp: `${query.timeStamp}`,
     //     },
   };
-  //   let token;
-  //   await Test.findOne(
-  //     { name: new RegExp('^' + `${query.name}` + '$', 'i') },
-  //     async function (err, doc) {
-  //       token = await doc.token;
-  //       console.log(token);
-  //     }
-  //   );
 
-  //   console.log(token);
-
-  //   const user = await Test.findOne(query.name);
-  //   console.log(`This is user ${user}`);
   const registrationToken = query.token;
   //   console.log(`This is user ${user.token}`);
 
