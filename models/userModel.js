@@ -37,14 +37,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a designation'],
   },
-  teamName: {
-    type: String,
-    required: [true, 'Please provide a team name'],
-  },
-  projectName: {
-    type: String,
-    required: [true, 'Please provide a project name'],
-  },
 });
 
 userSchema.pre('save', async function (next) {
