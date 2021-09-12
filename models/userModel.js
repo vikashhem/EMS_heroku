@@ -37,6 +37,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a designation'],
   },
+  token: {
+    type: String,
+  },
 });
 
 userSchema.pre('save', async function (next) {

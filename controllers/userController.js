@@ -10,20 +10,35 @@ const signToken = (id) => {
 
 exports.userSignup = async (req, res) => {
   try {
-    await User.create({
-      fullName: req.body.fullName,
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-      passwordConfirm: req.body.passwordConfirm,
-      designation: req.body.designation,
-      teamName: req.body.teamName,
-      projectName: req.body.projectName,
-    });
-
+    // await User.create({
+    //   fullName: req.body.fullName,
+    //   username: req.body.username,
+    //   email: req.body.email,
+    //   password: req.body.password,
+    //   passwordConfirm: req.body.passwordConfirm,
+    //   designation: req.body.designation,
+    //   teamName: req.body.teamName,
+    //   projectName: req.body.projectName,
+    // });
+    await User.create(req.body);
     res.status(200).json({
       status: true,
       message: 'User successfully created',
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({
+      status: true,
+      users,
     });
   } catch (error) {
     res.status(404).json({
