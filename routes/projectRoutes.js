@@ -1,6 +1,6 @@
 const express = require('express');
 const projectController = require('../controllers/projectController');
-const Project = require('../models/taskModel');
+// const Project = require('../models/taskModel');
 const router = express.Router();
 
 router
@@ -14,6 +14,5 @@ router
   .post(projectController.addUser)
   .patch(projectController.updateProject)
   .delete(projectController.deleteProject);
-
 
 module.exports = router;
