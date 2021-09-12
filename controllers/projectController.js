@@ -1,8 +1,10 @@
 const Project = require('../models/projectModel');
 const Admin = require('../models/adminModel');
+const User = require('../models/userModel');
 
 exports.createProject = async (req, res) => {
   try {
+    console.log(req.body.owner);
     const admin = await Admin.findOne({ username: req.body.owner });
     console.log(admin);
     if (!admin) {
@@ -68,7 +70,6 @@ exports.updateProject = async (req, res) => {
       });
     } else {
       const currId = req.params.id;
-
       const updatedProject = await Project.findByIdAndUpdate(currId, req.body, {
         new: true,
         runvalidators: true,
@@ -110,25 +111,64 @@ exports.deleteProject = async (req, res) => {
   }
 };
 
-exports.archiveProject = async (req, res) => {
-  try {
-    const currId = req.params.id;
-    const updatedProject = await Project.findByIdAndUpdate(
-      currId,
-      { isArchived:true },
+exports.addUser = async (req,res) =>{
+  try{
+  const user = await User.findOne({ username: req.body.username });
+  const currId = req.params.id;
+  if(!user){
+    res.status(403).json({
+      status: false,
+      message: "No such user exists",
+    });
+  }
+  else{
+    await Project.updateOne(
       {
-        new: true,
-        runvalidators: true,
+        _id: currId,
+      },
+      {
+        $push: { members: user._id },
       }
     );
     res.status(200).json({
       status: 1,
-      updatedProject,
+      message:"user successfully added"
     });
+  }
+}
+  catch(err){
+    res.status(400).json({
+      status: false,
+      message: err.message,
+    });
+  }
+}
+
+exports.getAddedUsers = async (req,res) =>{
+  try{
+  const project = await Project.findById(req.params.id);
+  const members = project.members;
+    if (!members.length) {
+      res.status(200).json({
+        status: true,
+        message: "No members in this project",
+      });
+    } else {
+      let allmembers = [];
+      for (const memberId of members) {
+        const user = await User.findById(memberId);
+        if (project.isActive) allmembers.push(user);
+      }
+      res.status(200).json({
+        status: 1,
+        length: allmembers.length,
+        allmembers,
+      });
+    }
   } catch (err) {
     res.status(400).json({
       status: 0,
       message: err.message,
     });
   }
-};
+}

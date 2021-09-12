@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
+//const validator = require('validator');
 //const Admin = require("./AdminModel");
 
 const projectSchema = new mongoose.Schema({
@@ -34,12 +34,12 @@ const projectSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Admin",
   },
-  /*members: [
+  members: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "Admin",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
-  ],*/
+  ],
 });
 
 const Project = mongoose.model('Project', projectSchema);
