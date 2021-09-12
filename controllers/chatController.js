@@ -11,6 +11,17 @@ const storage = multer.diskStorage({
       case 'image':
         cb(null, 'data/images/');
         break;
+      case 'audio':
+        cb(null, 'data/audios/');
+        break;
+      case 'video':
+        cb(null, 'data/videos/');
+        break;
+      case 'application':
+        cb(null, 'data/docs/');
+        break;
+      // default:
+      //   cb(null, 'data/others');
     }
   },
   filename: (req, file, cb) => {
@@ -29,21 +40,22 @@ const upload = multer({
     checkFileType(file, cb);
   },
 });
-exports.up = upload.single('images');
+exports.uploadInServer = upload.single('files');
 
 const checkFileType = (file, cb) => {
-  if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
+  if (
+    !file.originalname.match(
+      /\.(png|jpg|svg|jpeg|mp3|mp4|MPEG-4|mkv|pdf|docs)$/
+    )
+  ) {
     // upload only png and jpg format
-    return cb(new Error('Please upload a Image'));
+    return cb(new Error('Please upload a file'));
   }
   cb(undefined, true);
 };
 
-exports.uploadImage = (req, res) => {
-  console.log(req.file);
-  // const file = req.file.mimetype.split('/', 1).join();
-  // const type = file;
-  // console.log(file);
+exports.uploadToDataBase = (req, res) => {
+  console.log(req.body.receiverId);
   res.send(req.file);
 };
 
