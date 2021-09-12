@@ -9,7 +9,7 @@ const adminSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-    // unique: true,
+     unique: true,
     required: [true, 'Please provide an username'],
   },
   email: {
@@ -68,6 +68,12 @@ const adminSchema = new mongoose.Schema({
     required: [true, 'Please enter your address'],
     trim: true,
   },
+  projects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+    },
+  ],
 });
 
 adminSchema.pre('save', async function (next) {

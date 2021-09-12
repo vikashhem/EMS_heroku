@@ -23,9 +23,23 @@ const projectSchema = new mongoose.Schema({
     type: String,
   },
   isActive: {
-    type: Number,
-    default: 1,
+    type: Boolean,
+    default: true,
   },
+  isArchived:{
+    type:Boolean,
+    default:false,
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Admin",
+  },
+  /*members: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Admin",
+    },
+  ],*/
 });
 
 const Project = mongoose.model('Project', projectSchema);

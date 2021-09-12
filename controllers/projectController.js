@@ -1,11 +1,41 @@
 const Project = require('../models/projectModel');
+const Admin = require('../models/adminModel');
 
 exports.createProject = async (req, res) => {
   try {
-    await Project.create(req.body);
-    res.status(200).json({
-      status: true,
-    });
+    const admin = await Admin.findOne({ username: req.body.owner });
+    console.log(admin);
+    if (!admin) {
+      res.status(403).json({
+        status: false,
+        message: "No such username exists",
+      });
+    } else {
+      const project = await Project.create({
+        name: req.body.name,
+        description: req.body.description,
+        githubLink: req.body.githubLink,
+        driveLink: req.body.driveLink,
+        documentLink: req.body.documentLink,
+        owner: admin._id,
+        isActive:true,
+        isArchived:false
+      });
+
+      await Admin.updateOne(
+        {
+          _id: admin._id,
+        },
+        {
+          $push: { projects: project._id },
+        }
+      );
+
+      res.status(200).json({
+        status: 1,
+        token: project._id,
+      });
+    }
   } catch (err) {
     res.status(400).json({
       status: false,
@@ -25,6 +55,80 @@ exports.getAllProjects = async (req, res) => {
     res.status(404).json({
       status: false,
       message: error.message,
+    });
+  }
+};
+
+exports.updateProject = async (req, res) => {
+  try {
+    if (req.body.owner || req.body.isActive ) {
+      res.status(401).json({
+        status: 0,
+        message: "You cannot change the owner or status of project",
+      });
+    } else {
+      const currId = req.params.id;
+
+      const updatedProject = await Project.findByIdAndUpdate(currId, req.body, {
+        new: true,
+        runvalidators: true,
+      });
+      res.status(200).json({
+        status: 1,
+        updatedProject,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: 0,
+      message: err.message,
+    });
+  }
+};
+
+
+exports.deleteProject = async (req, res) => {
+  try {
+    const currId = req.params.id;
+    const updatedProject = await Project.findByIdAndUpdate(
+      currId,
+      { isActive: false },
+      {
+        new: true,
+        runvalidators: true,
+      }
+    );
+    res.status(200).json({
+      status: 1,
+      message:"Successfully deleted"
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 0,
+      message: err.message,
+    });
+  }
+};
+
+exports.archiveProject = async (req, res) => {
+  try {
+    const currId = req.params.id;
+    const updatedProject = await Project.findByIdAndUpdate(
+      currId,
+      { isArchived:true },
+      {
+        new: true,
+        runvalidators: true,
+      }
+    );
+    res.status(200).json({
+      status: 1,
+      updatedProject,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 0,
+      message: err.message,
     });
   }
 };
