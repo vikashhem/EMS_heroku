@@ -1,71 +1,71 @@
-const multer = require('multer');
-const path = require('path');
+var admin = require('firebase-admin');
 const Chat = require('../models/chatModel');
+const User = require('../models/userModel');
+var serviceAccount = require('../key.json');
 
-const storage = multer.diskStorage({
-  // Destination to store image
-  destination: (req, file, cb) => {
-    const type = file.mimetype.split('/', 1).join();
-    console.log(type);
-    switch (type) {
-      case 'image':
-        cb(null, 'data/images/');
-        break;
-      case 'audio':
-        cb(null, 'data/audios/');
-        break;
-      case 'video':
-        cb(null, 'data/videos/');
-        break;
-      case 'application':
-        cb(null, 'data/docs/');
-        break;
-      // default:
-      //   cb(null, 'data/others');
-    }
-  },
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      file.fieldname + '_' + Date.now() + path.extname(file.originalname)
-    );
-    // file.fieldname is name of the field (image)
-    // path.extname get the uploaded file extension
-  },
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
 });
 
-const upload = multer({
-  storage,
-  fileFilter(req, file, cb) {
-    checkFileType(file, cb);
-  },
-});
-exports.uploadInServer = upload.single('files');
+exports.uploadToDataBase = async (req, res) => {
+  try {
+    const user = await User.findOne({ token: req.body.senderId });
+    console.log(req.body.senderId);
+    console.log(user);
 
-const checkFileType = (file, cb) => {
-  if (
-    !file.originalname.match(
-      /\.(png|jpg|svg|jpeg|mp3|mp4|MPEG-4|mkv|pdf|docs)$/
-    )
-  ) {
-    // upload only png and jpg format
-    return cb(new Error('Please upload a file'));
+    res.send(req.files);
+  } catch (error) {
+    res.status(404).json({
+      status: false,
+      message: error.message,
+    });
   }
-  cb(undefined, true);
-};
-
-exports.uploadToDataBase = (req, res) => {
-  console.log(req.body.receiverId);
-  res.send(req.file);
 };
 
 exports.createChat = async (req, res) => {
   try {
-    const newChat = await Chat.create(req.body);
-    res.status(200).json({
-      status: true,
-      newChat,
-    });
+    const sender = await User.findOne({ token: req.body.senderId });
+    const receiver = await User.findOne({ token: req.body.receiverId });
+    console.log(req.body.senderId, req.body.receiverId);
+    // console.log(sender, receiver);
+
+    let textMessage = {
+      notification: {
+        title: `${sender.username} sent a message`,
+        body: `hi`,
+      },
+      data: {
+        type: `${req.body.messageType}`,
+      },
+    };
+    console.log(textMessage);
+
+    const notification_options = {
+      priority: 'high',
+      timeToLive: 60 * 60 * 24,
+    };
+    const options = notification_options;
+
+    const registrationToken = req.body.receiverId;
+
+    if (registrationToken != null) {
+      admin
+        .messaging()
+        .sendToDevice(registrationToken, textMessage, options)
+        .then(() => {
+          console.log('message successfully sent to device');
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else console.log('empty token');
+    res.send(req.body);
+
+    // const newChat = await Chat.create(req.body);
+    // res.status(200).json({
+    //   status: true,
+    //   newChat,
+    // });
   } catch (error) {
     res.status(404).json({
       status: false,
