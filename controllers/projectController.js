@@ -106,7 +106,7 @@ exports.updateProject = async (req, res) => {
 exports.deleteProject = async (req, res) => {
   try {
     const currId = req.params.id;
-    const updatedProject = await Project.findByIdAndUpdate(
+    await Project.findByIdAndUpdate(
       currId,
       { isActive: false },
       {

@@ -21,7 +21,13 @@ router
 
   router
   .route('/:id/tasks')
+  .get(taskController.getAllTasks)
   .post(taskController.createTask);
+
+router
+.route('/:id/tasks/:id')
+.get(taskController.getTask)
+.patch(taskController.updateTask)
 
 
 module.exports = router;
