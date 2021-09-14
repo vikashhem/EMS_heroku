@@ -33,21 +33,6 @@ exports.userSignup = async (req, res) => {
   }
 };
 
-exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json({
-      status: true,
-      users,
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: false,
-      message: error.message,
-    });
-  }
-};
-
 exports.userLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -80,17 +65,16 @@ exports.userLogin = async (req, res) => {
   }
 };
 
-exports.getAllUsers = async (req,res) =>{
-  try{
-  const users = await User.find();
-  res.status(200).json({
-    status: 'true',
-    users
-  });
-  }
-  catch(err){
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({
+      status: true,
+      users,
+    });
+  } catch (err) {
     res.status(404).json({
-      status: 'false',
+      status: false,
       message: error.message,
     });
   }
