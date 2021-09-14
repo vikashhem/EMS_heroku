@@ -10,10 +10,13 @@ router
 
 router
   .route('/:id')
-  .get(projectController.getAddedUsers)
+  .get(projectController.getProject)
   .post(projectController.addUser)
   .patch(projectController.updateProject)
   .delete(projectController.deleteProject);
 
+router
+  .route('/:id/team')
+  .get(projectController.getAddedUsers);
 
 module.exports = router;

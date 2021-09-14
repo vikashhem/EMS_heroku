@@ -61,6 +61,21 @@ exports.getAllProjects = async (req, res) => {
   }
 };
 
+exports.getProject = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    res.status(200).json({
+      status: 1,
+      project,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 0,
+      message: err.message,
+    });
+  }
+};
+
 exports.updateProject = async (req, res) => {
   try {
     if (req.body.owner || req.body.isActive ) {
@@ -148,23 +163,22 @@ exports.getAddedUsers = async (req,res) =>{
   try{
   const project = await Project.findById(req.params.id);
   const members = project.members;
-    if (!members.length) {
-      res.status(200).json({
-        status: true,
-        message: "No members in this project",
-      });
-    } else {
+  console.log(members)
+    
       let allmembers = [];
       for (const memberId of members) {
         const user = await User.findById(memberId);
-        if (project.isActive) allmembers.push(user);
+        console.log(user);
+        //if (project.isActive)
+        allmembers.push(user);
       }
+      console.log(allmembers)
       res.status(200).json({
         status: 1,
         length: allmembers.length,
         allmembers,
       });
-    }
+    
   } catch (err) {
     res.status(400).json({
       status: 0,
