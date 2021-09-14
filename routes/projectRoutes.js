@@ -1,6 +1,6 @@
 const express = require('express');
 const projectController = require('../controllers/projectController');
-// const Project = require('../models/taskModel');
+ const taskController = require('../controllers/taskController');
 const router = express.Router();
 
 router
@@ -18,5 +18,10 @@ router
 router
   .route('/:id/team')
   .get(projectController.getAddedUsers);
+
+  router
+  .route('/:id/tasks')
+  .post(taskController.createTask);
+
 
 module.exports = router;
