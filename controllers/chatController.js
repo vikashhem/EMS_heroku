@@ -24,8 +24,6 @@ const DifferentTypeOfMessage = (sender, message, type) => {
 exports.uploadToDataBase = async (req, res) => {
   try {
     // const sender = req.body.sender;
-    // const receiver = req.body.receiver;
-    // const messageToBeSaved = req.file.path;
     // const message = req.file.originalname;
     // const type = req.body.type;
 
@@ -52,8 +50,6 @@ exports.uploadToDataBase = async (req, res) => {
     // const options = notification_options;
 
     // const MessageToBeSent = DifferentTypeOfMessage(sender, message, type);
-    // // console.log(MessageToBeSent);
-
     // const registrationToken = 'abcd';
 
     // if (registrationToken != null) {
@@ -67,15 +63,14 @@ exports.uploadToDataBase = async (req, res) => {
     //       console.log(error);
     //     });
     // } else console.log('empty token');
+    const path = 'data/' + req.file.originalname;
 
     // const newChat = await Chat.create({
     //   type,
-    //   UsersChat: req.body.sender + req.body,
+    //   UsersChat: req.body.sender + req.body.receiver,
     //   sendBy: req.body.sender,
-    //   path: req.file.path,
+    //   message: path,
     // });
-    // const path = req.file.path;
-    const path = 'data/' + req.file.originalname;
 
     res.status(200).json({
       status: true,
