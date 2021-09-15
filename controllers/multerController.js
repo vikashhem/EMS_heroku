@@ -25,7 +25,9 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const type = file.mimetype.split('/', 1).join();
-    cb(null, type + '_' + Date.now() + path.extname(file.originalname));
+    console.log(file.originalname);
+    // cb(null, type + path.extname(file.originalname));
+    cb(null, file.originalname);
     // file.fieldname is name of the field (image)
     // path.extname get the uploaded file extension
   },
@@ -49,4 +51,4 @@ const checkFileType = (file, cb) => {
   }
   cb(undefined, true);
 };
-exports.uploadInServer = upload.array('files');
+exports.uploadInServer = upload.single('files');
