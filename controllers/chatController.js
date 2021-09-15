@@ -170,18 +170,18 @@ exports.getChatBetweenUsers = async (req, res) => {
       ],
     }).sort({ created_at: -1 });
 
-    let message = [];
+    // let message = [];
 
-    bothUser.forEach((element) => {
-      message.push(element.message);
-    });
-    if (message.length === 0) {
-      message = 'No conversation!';
-    }
+    // bothUser.forEach((element) => {
+    //   message.push(element.message);
+    // });
+    // if (message.length === 0) {
+    //   message = 'No conversation!';
+    // }
 
     res.status(201).json({
       status: true,
-      message,
+      bothUser,
     });
   } catch (error) {
     res.status(400).json({
