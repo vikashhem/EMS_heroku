@@ -64,6 +64,7 @@ exports.uploadToDataBase = async (req, res) => {
     //     });
     // } else console.log('empty token');
     const path = 'data/' + req.file.originalname;
+    const body = req.body;
 
     // const newChat = await Chat.create({
     //   type,
@@ -75,6 +76,7 @@ exports.uploadToDataBase = async (req, res) => {
     res.status(200).json({
       status: true,
       path,
+      body,
     });
   } catch (error) {
     res.status(404).json({
