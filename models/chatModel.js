@@ -5,17 +5,17 @@ const chatSchema = new mongoose.Schema({
   message: {
     type: String,
   },
-  sender: String,
-  receiver: String,
-  UsersChat: this.sender + this.receiver,
+  UsersChat: { type: String, select: false },
   type: {
     type: String,
     enum: ['text', 'audio', 'video', 'pdf', 'docs', 'image'],
     default: 'text',
+    select: false,
   },
   sendBy: String,
   path: {
     type: String,
+    select: false,
   },
 });
 chatSchema.plugin(timestamps);

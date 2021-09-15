@@ -23,63 +23,63 @@ const DifferentTypeOfMessage = (sender, message, type) => {
 
 exports.uploadToDataBase = async (req, res) => {
   try {
-    const sender = req.body.sender;
-    const receiver = req.body.receiver;
-    const messageToBeSaved = req.file.path;
-    const message = req.file.originalname;
-    const type = req.body.type;
+    // const sender = req.body.sender;
+    // const receiver = req.body.receiver;
+    // const messageToBeSaved = req.file.path;
+    // const message = req.file.originalname;
+    // const type = req.body.type;
 
-    const findTokenOfReceiver = await User.find({
-      username: req.body.receiver,
-    });
-    let token;
+    // const findTokenOfReceiver = await User.find({
+    //   username: req.body.receiver,
+    // });
+    // let token;
 
-    if (req.body.receiver === req.body.sender) {
-      throw new Error('You cannot send a message to yourself');
-    }
-    findTokenOfReceiver.forEach((element) => {
-      token = element.token;
-    });
-    if (!token) {
-      throw new Error('You cannot send a message');
-    }
-    console.log(token);
+    // if (req.body.receiver === req.body.sender) {
+    //   throw new Error('You cannot send a message to yourself');
+    // }
+    // findTokenOfReceiver.forEach((element) => {
+    //   token = element.token;
+    // });
+    // if (!token) {
+    //   throw new Error('You cannot send a message');
+    // }
+    // console.log(token);
 
-    const notification_options = {
-      priority: 'high',
-      timeToLive: 60 * 60 * 24,
-    };
-    const options = notification_options;
+    // const notification_options = {
+    //   priority: 'high',
+    //   timeToLive: 60 * 60 * 24,
+    // };
+    // const options = notification_options;
 
-    const MessageToBeSent = DifferentTypeOfMessage(sender, message, type);
-    // console.log(MessageToBeSent);
+    // const MessageToBeSent = DifferentTypeOfMessage(sender, message, type);
+    // // console.log(MessageToBeSent);
 
-    const registrationToken = 'abcd';
+    // const registrationToken = 'abcd';
 
-    if (registrationToken != null) {
-      admin
-        .messaging()
-        .sendToDevice(registrationToken, MessageToBeSent, options)
-        .then(() => {
-          console.log('message successfully sent to device');
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else console.log('empty token');
+    // if (registrationToken != null) {
+    //   admin
+    //     .messaging()
+    //     .sendToDevice(registrationToken, MessageToBeSent, options)
+    //     .then(() => {
+    //       console.log('message successfully sent to device');
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //     });
+    // } else console.log('empty token');
 
-    const newChat = await Chat.create({
-      message: messageToBeSaved,
-      sender,
-      receiver,
-      type,
-      UsersChat: req.body.sender + req.body.receiver,
-      path: req.file.path,
-    });
+    // const newChat = await Chat.create({
+    //   type,
+    //   UsersChat: req.body.sender + req.body,
+    //   sendBy: req.body.sender,
+    //   path: req.file.path,
+    // });
+    // const path = req.file.path;
+    const path = 'data/' + req.file.originalname;
 
     res.status(200).json({
       status: true,
-      newChat,
+      path,
     });
   } catch (error) {
     res.status(404).json({
