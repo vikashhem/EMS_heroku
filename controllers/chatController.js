@@ -1,7 +1,7 @@
 var admin = require('firebase-admin');
 const Chat = require('../models/chatModel');
 const User = require('../models/userModel');
-var serviceAccount = require('../key.json');
+const serviceAccount = require('../key.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -52,8 +52,7 @@ exports.uploadToDataBase = async (req, res) => {
     const options = notification_options;
 
     const MessageToBeSent = DifferentTypeOfMessage(sender, message, type);
-    console.log(MessageToBeSent);
-    // console.log(JSON.stringify(MessageToBeSent));
+    // console.log(MessageToBeSent);
 
     const registrationToken = 'abcd';
 
@@ -99,9 +98,9 @@ exports.createChat = async (req, res) => {
     }
     let token;
 
-    if (req.body.receiver === req.body.sender) {
-      throw new Error('You cannot send a message to yourself');
-    }
+    // if (req.body.receiver === req.body.sender) {
+    //   throw new Error('You cannot send a message to yourself');
+    // }
     receiver.forEach((element) => {
       token = element.token;
     });
