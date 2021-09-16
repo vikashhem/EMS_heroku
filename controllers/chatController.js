@@ -14,7 +14,7 @@ const DifferentTypeOfMessage = (sender, fileName, type) => {
     },
     data: {
       type,
-      url: `${message}`,
+      url: `${fileName}`,
       sendFrom: `${sender}`,
       fileName: `${fileName}`,
     },
@@ -32,9 +32,6 @@ exports.uploadToDataBase = async (req, res) => {
     });
     let token;
 
-    // if (req.body.receiver === req.body.sender) {
-    //   throw new Error('You cannot send a message to yourself');
-    // }
     findTokenOfReceiver.forEach((element) => {
       token = element.token;
     });
@@ -104,6 +101,14 @@ exports.createChat = async (req, res) => {
       token = element.token;
     });
     console.log(token);
+
+    const newChat = await Chat.create({
+      message: req.body.message,
+      type: 'text',
+      sendBy: req.body.sender,
+      UsersChat: req.body.sender + req.body.receiver,
+    });
+
     let textMessage = {
       notification: {
         title: `${req.body.sender} sent a message`,
@@ -111,10 +116,11 @@ exports.createChat = async (req, res) => {
       },
       data: {
         type: `text`,
-        url: `${req.body.message}`,
-        sendFrom: `${req.body.sender}`,
+        message: `${req.body.message}`,
+        sendBy: `${req.body.sender}`,
       },
     };
+    cons;
 
     const notification_options = {
       priority: 'high',
@@ -135,13 +141,6 @@ exports.createChat = async (req, res) => {
           console.log(error);
         });
     } else console.log('empty token');
-
-    const newChat = await Chat.create({
-      message: req.body.message,
-      type: 'text',
-      sendBy: req.body.sender,
-      UsersChat: req.body.sender + req.body.receiver,
-    });
     res.status(200).json({
       status: true,
       newChat,
