@@ -114,7 +114,6 @@ exports.createChat = async (req, res) => {
         sendBy: `${req.body.sender}`,
       },
     };
-    cons;
 
     const notification_options = {
       priority: 'high',
@@ -142,6 +141,7 @@ exports.createChat = async (req, res) => {
       sendBy: req.body.sender,
       UsersChat: req.body.sender + req.body.receiver,
     });
+
     res.status(200).json({
       status: true,
       newChat,
