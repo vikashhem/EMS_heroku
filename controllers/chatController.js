@@ -98,21 +98,10 @@ exports.createChat = async (req, res) => {
     }
     let token;
 
-    // if (req.body.receiver === req.body.sender) {
-    //   throw new Error('You cannot send a message to yourself');
-    // }
-
     receiver.forEach((element) => {
       token = element.token;
     });
     console.log(token);
-
-    const newChat = await Chat.create({
-      message: req.body.message,
-      type: 'text',
-      sendBy: req.body.sender,
-      UsersChat: req.body.sender + req.body.receiver,
-    });
 
     let textMessage = {
       notification: {
@@ -146,6 +135,13 @@ exports.createChat = async (req, res) => {
           console.log(error);
         });
     } else console.log('empty token');
+
+    const newChat = await Chat.create({
+      message: req.body.message,
+      type: 'text',
+      sendBy: req.body.sender,
+      UsersChat: req.body.sender + req.body.receiver,
+    });
     res.status(200).json({
       status: true,
       newChat,
