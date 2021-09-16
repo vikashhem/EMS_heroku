@@ -17,6 +17,7 @@ const chatSchema = new mongoose.Schema({
     type: String,
     select: false,
   },
+  versionKey: { select: false },
 });
 chatSchema.plugin(timestamps);
 

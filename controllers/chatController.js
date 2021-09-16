@@ -23,60 +23,60 @@ const DifferentTypeOfMessage = (sender, message, type) => {
 
 exports.uploadToDataBase = async (req, res) => {
   try {
-    // const sender = req.body.sender;
-    // const message = req.file.originalname;
-    // const type = req.body.type;
+    const sender = req.body.sender;
+    const message = req.file.originalname;
+    const type = req.body.type;
 
-    // const findTokenOfReceiver = await User.find({
-    //   username: req.body.receiver,
-    // });
-    // let token;
+    const findTokenOfReceiver = await User.find({
+      username: req.body.receiver,
+    });
+    let token;
 
-    // if (req.body.receiver === req.body.sender) {
-    //   throw new Error('You cannot send a message to yourself');
-    // }
-    // findTokenOfReceiver.forEach((element) => {
-    //   token = element.token;
-    // });
-    // if (!token) {
-    //   throw new Error('You cannot send a message');
-    // }
-    // console.log(token);
+    if (req.body.receiver === req.body.sender) {
+      throw new Error('You cannot send a message to yourself');
+    }
+    findTokenOfReceiver.forEach((element) => {
+      token = element.token;
+    });
+    if (!token) {
+      throw new Error('You cannot send a message');
+    }
+    console.log(token);
 
-    // const notification_options = {
-    //   priority: 'high',
-    //   timeToLive: 60 * 60 * 24,
-    // };
-    // const options = notification_options;
+    const notification_options = {
+      priority: 'high',
+      timeToLive: 60 * 60 * 24,
+    };
+    const options = notification_options;
 
-    // const MessageToBeSent = DifferentTypeOfMessage(sender, message, type);
-    // const registrationToken = 'abcd';
+    const MessageToBeSent = DifferentTypeOfMessage(sender, message, type);
+    const registrationToken = 'abcd';
 
-    // if (registrationToken != null) {
-    //   admin
-    //     .messaging()
-    //     .sendToDevice(registrationToken, MessageToBeSent, options)
-    //     .then(() => {
-    //       console.log('message successfully sent to device');
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // } else console.log('empty token');
-    const path = 'data/' + req.file.originalname;
-    const body = req.body;
+    if (registrationToken != null) {
+      admin
+        .messaging()
+        .sendToDevice(registrationToken, MessageToBeSent, options)
+        .then(() => {
+          console.log('message successfully sent to device');
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else console.log('empty token');
 
-    // const newChat = await Chat.create({
-    //   type,
-    //   UsersChat: req.body.sender + req.body.receiver,
-    //   sendBy: req.body.sender,
-    //   message: path,
-    // });
+    const path =
+      'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
+
+    const newChat = await Chat.create({
+      type,
+      UsersChat: req.body.sender + req.body.receiver,
+      sendBy: req.body.sender,
+      message: path,
+    });
 
     res.status(200).json({
       status: true,
-      path,
-      body,
+      newChat,
     });
   } catch (error) {
     res.status(404).json({
@@ -160,25 +160,16 @@ exports.getChatBetweenUsers = async (req, res) => {
     const sender = req.body.sender;
     const receiver = req.body.receiver;
 
-    const bothUser = await Chat.find({
+    const chats = await Chat.find({
       $or: [
         { UsersChat: { $eq: sender + receiver } },
         { UsersChat: { $eq: receiver + sender } },
       ],
     }).sort({ created_at: -1 });
 
-    // let message = [];
-
-    // bothUser.forEach((element) => {
-    //   message.push(element.message);
-    // });
-    // if (message.length === 0) {
-    //   message = 'No conversation!';
-    // }
-
     res.status(201).json({
       status: true,
-      bothUser,
+      chats,
     });
   } catch (error) {
     res.status(400).json({
