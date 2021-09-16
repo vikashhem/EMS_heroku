@@ -7,7 +7,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const DifferentTypeOfMessage = (sender, message, type) => {
+const DifferentTypeOfMessage = (sender, fileName, type) => {
   return {
     notification: {
       title: `${sender} sent a ${type} file`,
@@ -16,7 +16,7 @@ const DifferentTypeOfMessage = (sender, message, type) => {
       type,
       url: `${message}`,
       sendFrom: `${sender}`,
-      fileName: `${message}`,
+      fileName: `${fileName}`,
     },
   };
 };
@@ -24,7 +24,7 @@ const DifferentTypeOfMessage = (sender, message, type) => {
 exports.uploadToDataBase = async (req, res) => {
   try {
     const sender = req.body.sender;
-    const message = req.file.originalname;
+    const fileName = req.file.originalname;
     const type = req.body.type;
 
     const findTokenOfReceiver = await User.find({
@@ -49,8 +49,8 @@ exports.uploadToDataBase = async (req, res) => {
     };
     const options = notification_options;
 
-    const MessageToBeSent = DifferentTypeOfMessage(sender, message, type);
-    const registrationToken = 'abcd';
+    const MessageToBeSent = DifferentTypeOfMessage(sender, fileName, type);
+    const registrationToken = token;
 
     if (registrationToken != null) {
       admin
@@ -72,6 +72,7 @@ exports.uploadToDataBase = async (req, res) => {
       UsersChat: req.body.sender + req.body.receiver,
       sendBy: req.body.sender,
       message: path,
+      fileName,
     });
 
     res.status(200).json({
@@ -137,8 +138,6 @@ exports.createChat = async (req, res) => {
 
     const newChat = await Chat.create({
       message: req.body.message,
-      // sender: req.body.sender,
-      // receiver: req.body.receiver,
       type: 'text',
       sendBy: req.body.sender,
       UsersChat: req.body.sender + req.body.receiver,

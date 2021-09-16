@@ -11,6 +11,7 @@ const chatSchema = new mongoose.Schema({
     enum: ['text', 'audio', 'video', 'pdf', 'docs', 'image'],
     default: 'text',
   },
+  fileName: String,
   sendBy: String,
   path: {
     type: String,
