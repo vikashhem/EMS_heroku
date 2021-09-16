@@ -7,15 +7,15 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const DifferentTypeOfMessage = (sender, fileName, type) => {
+const DifferentTypeOfMessage = (sender, fileName, type, path) => {
   return {
     notification: {
       title: `${sender} sent a ${type} file`,
     },
     data: {
       type,
-      url: `${fileName}`,
-      sendFrom: `${sender}`,
+      message: path,
+      sendBy: `${sender}`,
       fileName: `${fileName}`,
     },
   };
@@ -24,8 +24,10 @@ const DifferentTypeOfMessage = (sender, fileName, type) => {
 exports.uploadToDataBase = async (req, res) => {
   try {
     const sender = req.body.sender;
-    const fileName = req.file.originalname;
+    const fileName = req.body.fileName;
     const type = req.body.type;
+    const path =
+      'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
 
     const findTokenOfReceiver = await User.find({
       username: req.body.receiver,
@@ -46,7 +48,13 @@ exports.uploadToDataBase = async (req, res) => {
     };
     const options = notification_options;
 
-    const MessageToBeSent = DifferentTypeOfMessage(sender, fileName, type);
+    const MessageToBeSent = DifferentTypeOfMessage(
+      sender,
+      fileName,
+      type,
+      path
+    );
+    console.log(MessageToBeSent);
     const registrationToken = token;
 
     if (registrationToken != null) {
@@ -60,9 +68,6 @@ exports.uploadToDataBase = async (req, res) => {
           console.log(error);
         });
     } else console.log('empty token');
-
-    const path =
-      'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
 
     const newChat = await Chat.create({
       type,
