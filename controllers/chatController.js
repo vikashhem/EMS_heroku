@@ -32,9 +32,9 @@ exports.uploadToDataBase = async (req, res) => {
     });
     let token;
 
-    if (req.body.receiver === req.body.sender) {
-      throw new Error('You cannot send a message to yourself');
-    }
+    // if (req.body.receiver === req.body.sender) {
+    //   throw new Error('You cannot send a message to yourself');
+    // }
     findTokenOfReceiver.forEach((element) => {
       token = element.token;
     });
