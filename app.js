@@ -7,7 +7,7 @@ const projectRoutes = require('./routes/projectRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 
 app.use(express.json());
-// app.use(cors());
+app.use('/data', express.static(__dirname + '/data'));
 
 app.use('/', adminRoutes);
 app.use('/users', userRoutes);

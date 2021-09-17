@@ -46,65 +46,64 @@ exports.createTask = async (req,res) =>{
     }
 }
 
-exports.updateTask = async (req,res) =>{
-    try{
+exports.updateTask = async (req, res) => {
+  try {
     const currId = req.params.id;
     console.log(currId);
-      const updatedTask = await Task.findByIdAndUpdate(currId, req.body, {
-        new: true,
-        runvalidators: true,
-      });
-      console.log(updatedTask)
-      res.status(200).json({
-        status: 1,
-        updatedTask,
-      });
+    const updatedTask = await Task.findByIdAndUpdate(currId, req.body, {
+      new: true,
+      runvalidators: true,
+    });
+    console.log(updatedTask);
+    res.status(200).json({
+      status: 1,
+      updatedTask,
+    });
   } catch (err) {
     res.status(400).json({
       status: 0,
       message: err.message,
     });
   }
-}
+};
 
-exports.getAllTasks = async (req,res) =>{
-    try{
-        const project = await Project.findById(req.params.id);
-        const tasks = project.tasks;
-        console.log(tasks)
-          
-            let allTasks = [];
-            for (const taskId of tasks) {
-              const task = await Task.findById(taskId);
-              console.log(task);
-              allTasks.push(task);
-            }
-            console.log(allTasks)
-            res.status(200).json({
-              status: 1,
-              length: allTasks.length,
-              allTasks,
-            });
-          
-        } catch (err) {
-          res.status(400).json({
-            status: 0,
-            message: err.message,
-          });
-        }
-}
+exports.getAllTasks = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    const tasks = project.tasks;
+    console.log(tasks);
 
-exports.getTask = async (req,res) =>{
-    try {
-        const task = await Task.findById(req.params.id);
-        res.status(200).json({
-          status: 1,
-          task,
-        });
-      } catch (err) {
-        res.status(400).json({
-          status: 0,
-          message: err.message,
-        });
-      }
-}
+    let allTasks = [];
+    for (const taskId of tasks) {
+      const task = await Task.findById(taskId);
+      console.log(task);
+      allTasks.push(task);
+    }
+    console.log(allTasks);
+    res.status(200).json({
+      status: 1,
+      length: allTasks.length,
+      allTasks,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 0,
+      message: err.message,
+    });
+  }
+};
+
+exports.getTask = async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    res.status(200).json({
+      status: 1,
+      task,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 0,
+      message: err.message,
+    });
+  }
+};

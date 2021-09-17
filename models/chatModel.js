@@ -1,20 +1,25 @@
 const mongoose = require('mongoose');
+const timestamps = require('mongoose-timestamp');
 
 const chatSchema = new mongoose.Schema({
   message: {
     type: String,
   },
-  senderId: String,
-  receiverId: String,
-  messageType: {
+  UsersChat: { type: String, select: false },
+  type: {
     type: String,
     enum: ['text', 'audio', 'video', 'pdf', 'docs', 'image'],
     default: 'text',
   },
+  fileName: String,
+  sendBy: String,
   path: {
     type: String,
+    select: false,
   },
+  versionKey: { select: false },
 });
+chatSchema.plugin(timestamps);
 
 const Chat = mongoose.model('Chat', chatSchema);
 module.exports = Chat;
