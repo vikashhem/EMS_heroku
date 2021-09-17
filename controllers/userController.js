@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
+const User = require('../models/userModel');
+const Task = require('../models/taskModel');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -79,3 +80,32 @@ exports.getAllUsers = async (req, res) => {
     });
   }
 };
+
+
+exports.getMyTasks = async (req,res) =>{
+  try{
+    console.log(req.query.username);
+    const users = await Task.find({
+      username:req.query.username
+    });
+    if(!users.length){
+      res.status(403).json({
+        status: false,
+        message: "No such user exists",
+      });
+      return;
+    }
+    res.status(200).json({
+      status: true,
+      length:users.length,
+      users,
+    });
+  }
+  catch(err){
+    res.status(404).json({
+      status: false,
+      message: error.message,
+    });
+  }
+  
+}

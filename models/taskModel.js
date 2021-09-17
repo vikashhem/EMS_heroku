@@ -8,7 +8,7 @@ const taskSchema = new mongoose.Schema({
     },
     username: {
         type: String,
-        required: [true, ' Please provide a project name'],
+        required: [true, ' Please provide a user name'],
         trim: true,
     },
     dueDate:{

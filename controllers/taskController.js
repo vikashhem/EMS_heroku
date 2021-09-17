@@ -1,8 +1,20 @@
 const Project = require('../models/projectModel');
 const Task = require('../models/taskModel');
+const User = require('../models/userModel');
 
 exports.createTask = async (req,res) =>{
     try{
+      const user = await User.find({
+        username:req.body.username
+      });
+      console.log(user);
+      if(!user.length){
+        res.status(403).json({
+          status: false,
+          message: "No such user exists",
+        });
+        return;
+      }
         const task = await Task.create({
             taskname:req.body.taskname,
             username:req.body.username,
