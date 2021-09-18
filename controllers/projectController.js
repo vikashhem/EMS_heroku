@@ -29,7 +29,12 @@ exports.createProject = async (req, res) => {
           _id: admin._id,
         },
         {
-          $push: { projects: project._id },
+          $push: { 
+            projects:{
+              projectId:project._id,
+              projectName:project.name
+            }
+          },
         }
       );
 
@@ -142,7 +147,10 @@ exports.addUser = async (req,res) =>{
         _id: currId,
       },
       {
-        $push: { members: user._id },
+        $push: { members:{
+          memberId:user._id,
+          memberName:user.username
+        }  },
       }
     );
     res.status(200).json({
@@ -166,8 +174,8 @@ exports.getAddedUsers = async (req,res) =>{
   console.log(members)
     
       let allmembers = [];
-      for (const memberId of members) {
-        const user = await User.findById(memberId);
+      for (const Id of members) {
+        const user = await User.findById(Id.memberId);
         console.log(user);
         //if (project.isActive)
         allmembers.push(user);

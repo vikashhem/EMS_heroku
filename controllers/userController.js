@@ -84,10 +84,10 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getMyTasks = async (req,res) =>{
   try{
-    console.log(req.query.username);
     const users = await Task.find({
-      username:req.query.username
+      assignedTo:req.query.username
     });
+    console.log(users);
     if(!users.length){
       res.status(403).json({
         status: false,
