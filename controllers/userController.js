@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const sharp = require('sharp');
+// const sharp = require('sharp');n
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const Task = require('../models/taskModel');
