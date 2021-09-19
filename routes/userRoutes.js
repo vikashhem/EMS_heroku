@@ -10,8 +10,8 @@ router.post('/login', userController.userLogin);
 
 router.patch(
   '/:username',
-  userController.uploadProfileAndCoverImage,
-  userController.resizesImages,
+  //   userController.uploadProfileAndCoverImage,
+  //   userController.resizesImages,
   userController.updateUser
 );
 

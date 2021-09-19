@@ -25,28 +25,28 @@ const upload = multer({
   fileFilter: multerFilter,
 });
 
-exports.uploadProfileAndCoverImage = upload.single('userPhoto');
+// exports.uploadProfileAndCoverImage = upload.single('userPhoto');
 
-exports.resizesImages = async (req, res, next) => {
-  console.log(req.file);
+// exports.resizesImages = async (req, res, next) => {
+//   console.log(req.file);
 
-  // const path = '/data/';
-  if (!req.file) return next();
-  console.log(req.file.originalname);
+//   // const path = '/data/';
+//   if (!req.file) return next();
+//   console.log(req.file.originalname);
 
-  // //1 User photo
-  const userPhotoName = req.file.originalname;
-  req.body.userPhoto = 'https://ems-heroku.herokuapp.com/' + userPhotoName;
+//   // //1 User photo
+//   const userPhotoName = req.file.originalname;
+//   req.body.userPhoto = 'https://ems-heroku.herokuapp.com/' + userPhotoName;
 
-  await sharp(req.file.buffer)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(userPhotoName);
+//   await sharp(req.file.buffer)
+//     .toFormat('jpeg')
+//     .jpeg({ quality: 90 })
+//     .toFile(userPhotoName);
 
-  //2 cover Photo
+//   //2 cover Photo
 
-  next();
-};
+//   next();
+// };
 
 exports.userSignup = async (req, res) => {
   try {
