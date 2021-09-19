@@ -45,15 +45,6 @@ exports.resizesImages = async (req, res, next) => {
 
   //2 cover Photo
 
-  // const coverPhotoName = req.files.coverPhoto[0].originalname;
-
-  // req.body.coverPhoto = 'https://ems-heroku.herokuapp.com/' + coverPhotoName;
-
-  // await sharp(req.files.coverPhoto[0].buffer)
-  //   .toFormat('jpeg')
-  //   .jpeg({ quality: 90 })
-  //   .toFile(coverPhotoName);
-
   next();
 };
 
