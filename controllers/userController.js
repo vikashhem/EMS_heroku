@@ -15,7 +15,7 @@ const signToken = (id) => {
 const multerStorage = multer.diskStorage({
   // Destination to store image
   destination: (req, file, cb) => {
-    cb(null, 'userImages');
+    cb(null, 'data');
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -136,7 +136,7 @@ exports.updateUser = async (req, res) => {
     });
     if (req.file) {
       req.body.userPhoto =
-        'https://ems-heroku.herokuapp.com/userImages/' + req.file.originalname;
+        'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
     }
 
     const updatedUser = await User.findByIdAndUpdate(id, req.body, {
