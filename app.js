@@ -1,5 +1,5 @@
 const express = require('express');
-// const path = require('path');
+const path = require('path');
 // const cors = require('cors');
 const app = express();
 const adminRoutes = require('./routes/adminRoutes');
@@ -9,7 +9,7 @@ const chatRoutes = require('./routes/chatRoutes');
 
 app.use(express.json());
 app.use('/data', express.static(__dirname + '/data'));
-// app.use(express.static(path.join(__dirname, 'userImages')));
+app.use(express.static(path.join(__dirname, 'userImages')));
 
 app.use('/', adminRoutes);
 app.use('/users', userRoutes);

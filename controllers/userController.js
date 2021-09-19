@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
+const path = require('path');
 // const sharp = require('sharp');n
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
@@ -11,7 +12,15 @@ const signToken = (id) => {
   });
 };
 
-const multerStorage = multer.memoryStorage();
+const multerStorage = multer.diskStorage({
+  // Destination to store image
+  destination: (req, file, cb) => {
+    cb(null, 'userImages');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
 
 const multerFilter = (req, file, cb) => {
   if (!file.originalname.match(/\.(png|jpg|svg|jpeg|jfif)$/)) {
@@ -25,28 +34,7 @@ const upload = multer({
   fileFilter: multerFilter,
 });
 
-// exports.uploadProfileAndCoverImage = upload.single('userPhoto');
-
-// exports.resizesImages = async (req, res, next) => {
-//   console.log(req.file);
-
-//   // const path = '/data/';
-//   if (!req.file) return next();
-//   console.log(req.file.originalname);
-
-//   // //1 User photo
-//   const userPhotoName = req.file.originalname;
-//   req.body.userPhoto = 'https://ems-heroku.herokuapp.com/' + userPhotoName;
-
-//   await sharp(req.file.buffer)
-//     .toFormat('jpeg')
-//     .jpeg({ quality: 90 })
-//     .toFile(userPhotoName);
-
-//   //2 cover Photo
-
-//   next();
-// };
+exports.uploadProfileImage = upload.single('userPhoto');
 
 exports.userSignup = async (req, res) => {
   try {
@@ -146,7 +134,10 @@ exports.updateUser = async (req, res) => {
     user.forEach((element) => {
       id = element.id;
     });
-    console.log(id);
+    if (req.file) {
+      req.body.userPhoto =
+        'https://ems-heroku.herokuapp.com/userImages/' + req.file.originalname;
+    }
 
     const updatedUser = await User.findByIdAndUpdate(id, req.body, {
       new: true,
