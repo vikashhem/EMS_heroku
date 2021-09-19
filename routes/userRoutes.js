@@ -8,5 +8,11 @@ router.get('/mytasks', userController.getMyTasks);
 router.post('/register', userController.userSignup);
 router.post('/login', userController.userLogin);
 
+router.patch(
+  '/:username',
+  userController.uploadProfileImage,
+  //   userController.resizesImages,
+  userController.updateUser
+);
 
 module.exports = router;

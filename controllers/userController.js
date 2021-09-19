@@ -1,4 +1,7 @@
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+// const sharp = require('sharp');n
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const Task = require('../models/taskModel');
@@ -9,18 +12,32 @@ const signToken = (id) => {
   });
 };
 
+const multerStorage = multer.diskStorage({
+  // Destination to store image
+  destination: (req, file, cb) => {
+    cb(null, 'data');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (!file.originalname.match(/\.(png|jpg|svg|jpeg|jfif)$/)) {
+    return cb(new Error('Please upload a image with png jpg svg or jpeg'));
+  }
+  cb(undefined, true);
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadProfileImage = upload.single('userPhoto');
+
 exports.userSignup = async (req, res) => {
   try {
-    // await User.create({
-    //   fullName: req.body.fullName,
-    //   username: req.body.username,
-    //   email: req.body.email,
-    //   password: req.body.password,
-    //   passwordConfirm: req.body.passwordConfirm,
-    //   designation: req.body.designation,
-    //   teamName: req.body.teamName,
-    //   projectName: req.body.projectName,
-    // });
     await User.create(req.body);
     res.status(200).json({
       status: true,
@@ -81,32 +98,61 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-
-exports.getMyTasks = async (req,res) =>{
-  try{
+exports.getMyTasks = async (req, res) => {
+  try {
     const users = await Task.find({
-      assignedTo:req.query.username
+      assignedTo: req.query.username,
     });
     //send only non deleted tasks
     console.log(users);
-    if(!users.length){
+    if (!users.length) {
       res.status(403).json({
         status: false,
-        message: "No such user exists",
+        message: 'No such user exists',
       });
       return;
     }
     res.status(200).json({
       status: true,
-      length:users.length,
+      length: users.length,
       users,
     });
-  }
-  catch(err){
+  } catch (err) {
     res.status(404).json({
       status: false,
       message: error.message,
     });
   }
-  
-}
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    const username = req.params.username;
+    // const thingsToBeUpdated = req.body;
+    const user = await User.find({ username });
+    let id;
+
+    user.forEach((element) => {
+      id = element.id;
+    });
+    if (req.file) {
+      req.body.userPhoto =
+        'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runvalidators: true,
+    });
+
+    res.status(201).json({
+      status: true,
+      updatedUser,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: false,
+      message: error.message,
+    });
+  }
+};

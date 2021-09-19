@@ -1,6 +1,6 @@
 const express = require('express');
 const projectController = require('../controllers/projectController');
- const taskController = require('../controllers/taskController');
+const taskController = require('../controllers/taskController');
 const router = express.Router();
 
 router
@@ -15,20 +15,17 @@ router
   .patch(projectController.updateProject)
   .delete(projectController.deleteProject);
 
-router
-  .route('/:id/team')
-  .get(projectController.getAddedUsers);
+router.route('/:id/team').get(projectController.getAddedUsers);
 
-  router
+router
   .route('/:id/tasks')
   .get(taskController.getAllTasks)
   .post(taskController.createTask);
 
 router
-.route('/:id/tasks/:id')
-.get(taskController.getTask)
-.patch(taskController.updateTask)
-.delete(taskController.deleteTask);
-
+  .route('/:id/tasks/:id')
+  .get(taskController.getTask)
+  .patch(taskController.updateTask);
+// .delete(taskController.deleteTask);
 
 module.exports = router;
