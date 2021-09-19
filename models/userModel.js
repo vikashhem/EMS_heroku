@@ -40,6 +40,12 @@ const userSchema = new mongoose.Schema({
   token: {
     type: String,
   },
+  userPhoto: {
+    type: String,
+  },
+  coverPhoto: {
+    type: String,
+  },
 });
 
 userSchema.pre('save', async function (next) {
