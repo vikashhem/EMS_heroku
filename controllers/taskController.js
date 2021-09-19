@@ -1,65 +1,71 @@
 const Project = require('../models/projectModel');
 const Task = require('../models/taskModel');
 
-exports.createTask = async (req, res) => {
-  try {
-    const task = await Task.create({
-      taskname: req.body.taskname,
-      username: req.body.username,
-      dueDate: req.body.dueDate,
-      description: req.body.description,
-      assigned: req.body.assigned,
-      priority: req.body.priority,
-      isCompleted: false,
+
+exports.createTask = async (req,res) =>{
+  try{
+    const user1 = await User.find({
+      username:req.body.assignedTo
     });
-    await Project.updateOne(
-      {
-        _id: req.params.id,
-      },
-      {
-        $push: { tasks: task._id },
-      }
+    const admin = await Admin.find({
+      username:req.body.assignedBy
+    });
+    const project = await Project.findById(req.path.split('/')[1]) ;
+    console.log(user1);
+    if(!user1.length){
+      res.status(403).json({
+        status: false,
+        message: "No such user exists",
+      });
+      return;
+    }
+    if(!admin.length){
+      res.status(403).json({
+        status: false,
+        message: "No such admin exists",
+      });
+      return;
+    }
+    
+    
+      const task = await Task.create({
+          taskname:req.body.taskname,
+          assignedBy:req.body.assignedBy,
+          assignedTo:req.body.assignedTo,
+          dueDate:req.body.dueDate,
+          description:req.body.description,
+          assigned:req.body.assigned || true,
+          priority:req.body.priority || 0,
+          status: req.body.status || 0,
+          isCompleted:req.body.isComplete || false,
+          isDeleted:false,
+          projectId:project._id,
+          projectName:project.name
+      })
+      //console.log(req.params.id);
       
-      
-        const task = await Task.create({
-            taskname:req.body.taskname,
-            assignedBy:req.body.assignedBy,
-            assignedTo:req.body.assignedTo,
-            dueDate:req.body.dueDate,
-            description:req.body.description,
-            assigned:req.body.assigned || true,
-            priority:req.body.priority || 0,
-            status: req.body.status || 0,
-            isCompleted:req.body.isComplete || false,
-            isDeleted:false,
-            isFavourite:req.body.isFavourite || false,
-            projectId:project._id,
-            projectName:project.name
+        await Project.updateOne(
+          {
+            _id: req.params.id,
+          },
+          {
+            $push: { tasks:{
+              taskId:task._id,
+              taskName:req.body.taskname
+            }  },
+          }
+        );
+        res.status(200).json({
+          status: 1,
+          task
         })
-        //console.log(req.params.id);
-        
-          await Project.updateOne(
-            {
-              _id: req.params.id,
-            },
-            {
-              $push: { tasks:{
-                taskId:task._id,
-                taskName:req.body.taskname
-              }  },
-            }
-          );
-          res.status(200).json({
-            status: 1,
-            task
-          })
-    }
-    catch(err){
-        res.status(400).json({
-            status: false,
-            message: err.message,
-        });  
-    }
+  }
+  catch(err){
+      res.status(400).json({
+          status: false,
+          message: err.message,
+      });  
+  }
 }
 
 exports.updateTask = async (req, res) => {
