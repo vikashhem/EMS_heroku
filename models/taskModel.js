@@ -47,6 +47,10 @@ const taskSchema = new mongoose.Schema({
         type:Boolean,
         default:false,
     },
+    isFavourite:{
+        type:Boolean,
+        default:false,
+    },
     projectId:{
             type: mongoose.Schema.Types.ObjectId,
             ref: "Project",

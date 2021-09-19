@@ -87,6 +87,7 @@ exports.getMyTasks = async (req,res) =>{
     const users = await Task.find({
       assignedTo:req.query.username
     });
+    //send only non deleted tasks
     console.log(users);
     if(!users.length){
       res.status(403).json({

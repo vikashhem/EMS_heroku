@@ -40,6 +40,7 @@ exports.createTask = async (req,res) =>{
             status: req.body.status || 0,
             isCompleted:req.body.isComplete || false,
             isDeleted:false,
+            isFavourite:req.body.isFavourite || false,
             projectId:project._id,
             projectName:project.name
         })
@@ -99,6 +100,7 @@ exports.getAllTasks = async (req, res) => {
     let allTasks = [];
     for (const Id of tasks) {
       const task = await Task.findById(Id.taskId);
+      console.log(task)
       console.log(task.isDeleted);
       if(!task.isDeleted) allTasks.push(task);
     }
