@@ -1,6 +1,6 @@
-const Project = require('../models/projectModel');
-const Admin = require('../models/adminModel');
-const User = require('../models/userModel');
+const Project = require("../models/projectModel");
+const Admin = require("../models/adminModel");
+const User = require("../models/userModel");
 
 exports.createProject = async (req, res) => {
   try {
@@ -20,8 +20,8 @@ exports.createProject = async (req, res) => {
         driveLink: req.body.driveLink,
         documentLink: req.body.documentLink,
         owner: admin._id,
-        isActive:true,
-        isArchived:false
+        isActive: true,
+        isArchived: false,
       });
 
       await Admin.updateOne(
@@ -29,11 +29,11 @@ exports.createProject = async (req, res) => {
           _id: admin._id,
         },
         {
-          $push: { 
-            projects:{
-              projectId:project._id,
-              projectName:project.name
-            }
+          $push: {
+            projects: {
+              projectId: project._id,
+              projectName: project.name,
+            },
           },
         }
       );
@@ -53,10 +53,13 @@ exports.createProject = async (req, res) => {
 
 exports.getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find();
+    const projects = await Project.find({
+      isActive: true,
+    });
     res.status(201).json({
       status: true,
-      message: projects,
+      length: projects.length,
+      projects,
     });
   } catch (error) {
     res.status(404).json({
@@ -83,7 +86,7 @@ exports.getProject = async (req, res) => {
 
 exports.updateProject = async (req, res) => {
   try {
-    if (req.body.owner || req.body.isActive ) {
+    if (req.body.owner || req.body.isActive) {
       res.status(401).json({
         status: 0,
         message: "You cannot change the owner or status of project",
@@ -107,7 +110,6 @@ exports.updateProject = async (req, res) => {
   }
 };
 
-
 exports.deleteProject = async (req, res) => {
   try {
     const currId = req.params.id;
@@ -121,7 +123,7 @@ exports.deleteProject = async (req, res) => {
     );
     res.status(200).json({
       status: 1,
-      message:"Successfully deleted"
+      message: "Successfully deleted",
     });
   } catch (err) {
     res.status(400).json({
@@ -131,66 +133,87 @@ exports.deleteProject = async (req, res) => {
   }
 };
 
-exports.addUser = async (req,res) =>{
-  try{
-  const user = await User.findOne({ username: req.body.username });
-  const currId = req.params.id;
-  if(!user){
-    res.status(403).json({
-      status: false,
-      message: "No such user exists",
-    });
-  }
-  else{
-    await Project.updateOne(
-      {
-        _id: currId,
-      },
-      {
-        $push: { members:{
-          memberId:user._id,
-          memberName:user.username
-        }  },
+exports.addUser = async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.body.username });
+    const currId = req.params.id;
+    if (!user) {
+      res.status(403).json({
+        status: false,
+        message: "No such user exists",
+      });
+    } else {
+      //only add when active and if the user does not exist
+      const project = await Project.findById(currId);
+      if (!project || !project.isActive) {
+        res.status(200).json({
+          status: false,
+          message: "No such Project exists",
+        });
+        return;
       }
-    );
-    res.status(200).json({
-      status: 1,
-      message:"user successfully added"
-    });
-  }
-}
-  catch(err){
+
+      const member = await project.members.find(
+        (member) => JSON.stringify(member.memberId) === JSON.stringify(user._id)
+      );
+      if (member) {
+        res.status(200).json({
+          status: false,
+          message: "Member already exists",
+        });
+        return;
+      }
+
+      await Project.updateOne(
+        {
+          _id: currId,
+        },
+        {
+          $push: {
+            members: {
+              memberId: user._id,
+              memberName: user.username,
+            },
+          },
+        }
+      );
+      //console.log(user)
+      res.status(200).json({
+        status: 1,
+        message: "user successfully added",
+      });
+    }
+  } catch (err) {
     res.status(400).json({
       status: false,
       message: err.message,
     });
   }
-}
+};
 
-exports.getAddedUsers = async (req,res) =>{
-  try{
-  const project = await Project.findById(req.params.id);
-  const members = project.members;
-  console.log(members)
-    
-      let allmembers = [];
-      for (const Id of members) {
-        const user = await User.findById(Id.memberId);
-        console.log(user);
-        //if (project.isActive)
-        allmembers.push(user);
-      }
-      console.log(allmembers)
-      res.status(200).json({
-        status: 1,
-        length: allmembers.length,
-        allmembers,
-      });
-    
+exports.getAddedUsers = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    const members = project.members;
+    console.log(members);
+
+    let allmembers = [];
+    for (const Id of members) {
+      const user = await User.findById(Id.memberId);
+      console.log(user);
+      //if (project.isActive)
+      allmembers.push(user);
+    }
+    console.log(allmembers);
+    res.status(200).json({
+      status: 1,
+      length: allmembers.length,
+      allmembers,
+    });
   } catch (err) {
     res.status(400).json({
       status: 0,
       message: err.message,
     });
   }
-}
+};
