@@ -22,6 +22,7 @@ exports.createProject = async (req, res) => {
         owner: admin._id,
         isActive: true,
         isArchived: false,
+        isFav: false,
       });
 
       await Admin.updateOne(

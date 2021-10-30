@@ -1,17 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 //const validator = require('validator');
 //const Admin = require("./AdminModel");
 
 const projectSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, ' Please provide a project name'],
+    required: [true, " Please provide a project name"],
     trim: true,
     unique: true,
   },
   description: {
     type: String,
-    required: [true, 'Please tell about the project'],
+    required: [true, "Please tell about the project"],
   },
   githubLink: {
     type: String,
@@ -26,9 +26,13 @@ const projectSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  isArchived:{
-    type:Boolean,
-    default:false,
+  isArchived: {
+    type: Boolean,
+    default: false,
+  },
+  isFav: {
+    type: Boolean,
+    default: false,
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -36,27 +40,27 @@ const projectSchema = new mongoose.Schema({
   },
   members: [
     {
-    memberId:{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      memberId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      memberName: {
+        type: String,
+      },
     },
-    memberName:{
-      type:String
-    },
-  }
   ],
   tasks: [
     {
-      taskId:{
+      taskId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Task",
       },
-      taskName:{
-        type:String
+      taskName: {
+        type: String,
       },
-    }
+    },
   ],
 });
 
-const Project = mongoose.model('Project', projectSchema);
+const Project = mongoose.model("Project", projectSchema);
 module.exports = Project;
