@@ -6,6 +6,7 @@ const router = express.Router();
 router.get('/', userController.getAllUsers);
 router.get('/mytasks', userController.getMyTasks);
 router.post('/register', userController.userSignup);
+router.patch('/updateToken', userController.updateTokenOfUser);
 router.post('/login', userController.userLogin);
 
 router.patch(

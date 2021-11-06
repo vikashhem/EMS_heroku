@@ -1,10 +1,10 @@
-const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const path = require("path");
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
 // const sharp = require('sharp');
-const bcrypt = require("bcryptjs");
-const User = require("../models/userModel");
-const Task = require("../models/taskModel");
+const bcrypt = require('bcryptjs');
+const User = require('../models/userModel');
+const Task = require('../models/taskModel');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -15,7 +15,7 @@ const signToken = (id) => {
 const multerStorage = multer.diskStorage({
   // Destination to store image
   destination: (req, file, cb) => {
-    cb(null, "data");
+    cb(null, 'data');
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -24,7 +24,7 @@ const multerStorage = multer.diskStorage({
 
 const multerFilter = (req, file, cb) => {
   if (!file.originalname.match(/\.(png|jpg|svg|jpeg|jfif)$/)) {
-    return cb(new Error("Please upload a image with png jpg svg or jpeg"));
+    return cb(new Error('Please upload a image with png jpg svg or jpeg'));
   }
   cb(undefined, true);
 };
@@ -34,14 +34,14 @@ const upload = multer({
   fileFilter: multerFilter,
 });
 
-exports.uploadProfileImage = upload.single("userPhoto");
+exports.uploadProfileImage = upload.single('userPhoto');
 
 exports.userSignup = async (req, res) => {
   try {
     await User.create(req.body);
     res.status(200).json({
       status: true,
-      message: "User successfully created",
+      message: 'User successfully created',
     });
   } catch (error) {
     res.status(404).json({
@@ -58,7 +58,7 @@ exports.userLogin = async (req, res) => {
     if (!username || !password) {
       res.status(400).json({
         status: false,
-        message: "Please enter username and password",
+        message: 'Please enter username and password',
       });
     }
 
@@ -67,17 +67,18 @@ exports.userLogin = async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({
         status: false,
-        message: "Invalid Credentials",
+        message: 'Invalid Credentials',
       });
     }
     const token = signToken(user._id);
+
     res.status(200).json({
-      status: "true",
+      status: 'true',
       token,
     });
   } catch (error) {
     res.status(404).json({
-      status: "false",
+      status: 'false',
       message: error.message,
     });
   }
@@ -106,7 +107,7 @@ exports.getMyTasks = async (req, res) => {
     if (!checkUser.length) {
       res.status(403).json({
         status: false,
-        message: "No such User exists",
+        message: 'No such User exists',
       });
       return;
     }
@@ -120,7 +121,7 @@ exports.getMyTasks = async (req, res) => {
     if (!users.length) {
       res.status(403).json({
         status: false,
-        message: "No Task exists",
+        message: 'No Task exists',
       });
       return;
     }
@@ -149,7 +150,7 @@ exports.updateUser = async (req, res) => {
     });
     if (req.file) {
       req.body.userPhoto =
-        "https://ems-heroku.herokuapp.com/data/" + req.file.originalname;
+        'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
     }
 
     const updatedUser = await User.findByIdAndUpdate(id, req.body, {
@@ -160,6 +161,33 @@ exports.updateUser = async (req, res) => {
     res.status(201).json({
       status: true,
       updatedUser,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.updateTokenOfUser = async (req, res) => {
+  try {
+    const { username } = req.body;
+    const user = await User.findOne({ username });
+    const userId = user.id;
+
+    await User.findByIdAndUpdate(
+      userId,
+      {
+        token: req.body.token,
+      },
+      {
+        new: true,
+      }
+    );
+    res.status(201).json({
+      status: true,
+      token,
     });
   } catch (error) {
     res.status(404).json({
