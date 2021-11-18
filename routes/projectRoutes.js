@@ -8,6 +8,8 @@ router
   .get(projectController.getAllProjects)
   .post(projectController.createProject);
 
+router.route("/search").get(projectController.findProjects);
+
 router
   .route("/:id")
   .get(projectController.getProject)

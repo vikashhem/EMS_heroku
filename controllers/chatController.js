@@ -7,6 +7,20 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
+exports.notificationOverall = (registrationToken, MessageToBeSent, options) => {
+  if (registrationToken != null) {
+    admin
+      .messaging()
+      .sendToDevice(registrationToken, MessageToBeSent, options)
+      .then(() => {
+        console.log('notification successfully sent to device');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  } else console.log('empty token');
+};
+
 const DifferentTypeOfMessage = (sender, fileName, type, path) => {
   return {
     notification: {

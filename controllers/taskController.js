@@ -1,7 +1,10 @@
+const admin = require("firebase-admin");
+const serviceAccount = require("../key.json");
 const Project = require("../models/projectModel");
 const Task = require("../models/taskModel");
 const User = require("../models/userModel");
 const Admin = require("../models/adminModel");
+const notification = require("./chatController");
 
 let findRatio = async (project, taskAdded) => {
   if (!project.isActive) return;
@@ -34,6 +37,18 @@ let findRatio = async (project, taskAdded) => {
   console.log(totalTasks);
   console.log(ratio);
   return ratio;
+};
+
+const NotificationTitle = (task) => {
+  return {
+    notification: {
+      title: `${task}`,
+      body: "Task has been assigned.",
+    },
+    data: {
+      type: "task",
+    },
+  };
 };
 
 exports.createTask = async (req, res) => {
@@ -72,6 +87,25 @@ exports.createTask = async (req, res) => {
       });
       return;
     }
+
+    user1.forEach((element) => {
+      token = element.token;
+    });
+    if (!token) {
+      throw new Error("No token found");
+    }
+    console.log(token);
+
+    const notification_options = {
+      priority: "high",
+      timeToLive: 60 * 60 * 24,
+    };
+    const options = notification_options;
+
+    const MessageToBeSent = NotificationTitle(req.body.taskname);
+    console.log(MessageToBeSent);
+
+    notification.notificationOverall(token, MessageToBeSent, options);
 
     const task = await Task.create({
       taskname: req.body.taskname,
