@@ -1,26 +1,26 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
-const bcrypt = require('bcryptjs');
+const mongoose = require("mongoose");
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
-    required: [true, 'Please provide the full name'],
+    required: [true, "Please provide the full name"],
   },
   username: {
     type: String,
-    required: [true, 'Please provide the username'],
-    unique: [true, 'That username has already been taken'],
+    required: [true, "Please provide the username"],
+    unique: [true, "That username has already been taken"],
   },
   email: {
     type: String,
-    unique: [true, 'That email is already been used'],
-    required: [true, 'Please provide an email address'],
-    validate: [validator.isEmail, 'Please provide an valid email'],
+    unique: [true, "That email is already been used"],
+    required: [true, "Please provide an email address"],
+    validate: [validator.isEmail, "Please provide an valid email"],
   },
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
+    required: [true, "Please provide a password"],
   },
   passwordConfirm: {
     type: String,
@@ -30,12 +30,12 @@ const userSchema = new mongoose.Schema({
       validator: function (el) {
         return el === this.password;
       },
-      message: 'Password are not the same',
+      message: "Password are not the same",
     },
   },
   designation: {
     type: String,
-    required: [true, 'Please provide a designation'],
+    required: [true, "Please provide a designation"],
   },
   token: {
     type: String,
@@ -46,11 +46,22 @@ const userSchema = new mongoose.Schema({
   coverPhoto: {
     type: String,
   },
+  projects: [
+    {
+      projectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      projectName: {
+        type: String,
+      },
+    },
+  ],
 });
 
-userSchema.pre('save', async function (next) {
+userSchema.pre("save", async function (next) {
   //this function only run if password is modified
-  if (!this.isModified('password')) return next();
+  if (!this.isModified("password")) return next();
 
   //hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
@@ -58,5 +69,5 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 module.exports = User;

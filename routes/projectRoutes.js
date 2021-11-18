@@ -1,31 +1,35 @@
-const express = require('express');
-const projectController = require('../controllers/projectController');
-const taskController = require('../controllers/taskController');
+const express = require("express");
+const projectController = require("../controllers/projectController");
+const taskController = require("../controllers/taskController");
 const router = express.Router();
 
 router
-  .route('/')
+  .route("/")
   .get(projectController.getAllProjects)
   .post(projectController.createProject);
 
 router
-  .route('/:id')
+  .route("/:id")
   .get(projectController.getProject)
   .post(projectController.addUser)
   .patch(projectController.updateProject)
   .delete(projectController.deleteProject);
 
-router.route('/:id/team').get(projectController.getAddedUsers);
+router.route("/:id/team").get(projectController.getAddedUsers);
 
 router
-  .route('/:id/tasks')
+  .route("/:id/tasks")
   .get(taskController.getAllTasks)
   .post(taskController.createTask);
 
 router
-  .route('/:id/tasks/:id')
+  .route("/:id/tasks/:id")
   .get(taskController.getTask)
   .patch(taskController.updateTask)
- .delete(taskController.deleteTask);
+  .delete(taskController.deleteTask);
+
+router.route("/:id/tasks/:id/verify").get(taskController.verifyTask);
+
+//make a func for admin or user check
 
 module.exports = router;

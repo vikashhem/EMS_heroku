@@ -23,6 +23,7 @@ exports.createProject = async (req, res) => {
         isActive: true,
         isArchived: false,
         isFav: false,
+        completionRatio: -1,
       });
 
       await Admin.updateOne(
@@ -56,6 +57,8 @@ exports.getAllProjects = async (req, res) => {
   try {
     const projects = await Project.find({
       isActive: true,
+    }).sort({
+      _id: -1,
     });
     res.status(201).json({
       status: true,
@@ -72,7 +75,7 @@ exports.getAllProjects = async (req, res) => {
 
 exports.getProject = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.find({ _id: req.params.id, isActive: true });
     res.status(200).json({
       status: 1,
       project,
@@ -178,6 +181,20 @@ exports.addUser = async (req, res) => {
           },
         }
       );
+
+      await User.updateOne(
+        {
+          _id: user._id,
+        },
+        {
+          $push: {
+            projects: {
+              projectId: project._id,
+              projectName: project.name,
+            },
+          },
+        }
+      );
       //console.log(user)
       res.status(200).json({
         status: 1,
@@ -205,7 +222,7 @@ exports.getAddedUsers = async (req, res) => {
       //if (project.isActive)
       allmembers.push(user);
     }
-    console.log(allmembers);
+    //console.log(allmembers);
     res.status(200).json({
       status: 1,
       length: allmembers.length,

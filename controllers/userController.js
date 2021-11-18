@@ -113,7 +113,7 @@ exports.getMyTasks = async (req, res) => {
     const users = await Task.find({
       assignedTo: req.query.username,
       isDeleted: false,
-    });
+    }).sort({ dueDate: -1 });
     //check if user exists
     //send only non deleted tasks
     //console.log(users);
