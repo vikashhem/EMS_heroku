@@ -8,6 +8,8 @@ router
   .get(projectController.getAllProjects)
   .post(projectController.createProject);
 
+router.route('/search').get(projectController.findProjects);
+
 router
   .route('/:id')
   .get(projectController.getProject)
@@ -26,6 +28,6 @@ router
   .route('/:id/tasks/:id')
   .get(taskController.getTask)
   .patch(taskController.updateTask)
- .delete(taskController.deleteTask);
+  .delete(taskController.deleteTask);
 
 module.exports = router;

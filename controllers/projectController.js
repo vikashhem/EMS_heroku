@@ -1,6 +1,6 @@
-const Project = require("../models/projectModel");
-const Admin = require("../models/adminModel");
-const User = require("../models/userModel");
+const Project = require('../models/projectModel');
+const Admin = require('../models/adminModel');
+const User = require('../models/userModel');
 
 exports.createProject = async (req, res) => {
   try {
@@ -10,7 +10,7 @@ exports.createProject = async (req, res) => {
     if (!admin) {
       res.status(403).json({
         status: false,
-        message: "No such username exists",
+        message: 'No such username exists',
       });
     } else {
       const project = await Project.create({
@@ -90,7 +90,7 @@ exports.updateProject = async (req, res) => {
     if (req.body.owner || req.body.isActive) {
       res.status(401).json({
         status: 0,
-        message: "You cannot change the owner or status of project",
+        message: 'You cannot change the owner or status of project',
       });
     } else {
       const currId = req.params.id;
@@ -124,7 +124,7 @@ exports.deleteProject = async (req, res) => {
     );
     res.status(200).json({
       status: 1,
-      message: "Successfully deleted",
+      message: 'Successfully deleted',
     });
   } catch (err) {
     res.status(400).json({
@@ -141,7 +141,7 @@ exports.addUser = async (req, res) => {
     if (!user) {
       res.status(403).json({
         status: false,
-        message: "No such user exists",
+        message: 'No such user exists',
       });
     } else {
       //only add when active and if the user does not exist
@@ -149,7 +149,7 @@ exports.addUser = async (req, res) => {
       if (!project || !project.isActive) {
         res.status(200).json({
           status: false,
-          message: "No such Project exists",
+          message: 'No such Project exists',
         });
         return;
       }
@@ -160,7 +160,7 @@ exports.addUser = async (req, res) => {
       if (member) {
         res.status(200).json({
           status: false,
-          message: "Member already exists",
+          message: 'Member already exists',
         });
         return;
       }
@@ -181,7 +181,7 @@ exports.addUser = async (req, res) => {
       //console.log(user)
       res.status(200).json({
         status: 1,
-        message: "user successfully added",
+        message: 'user successfully added',
       });
     }
   } catch (err) {
@@ -215,6 +215,26 @@ exports.getAddedUsers = async (req, res) => {
     res.status(400).json({
       status: 0,
       message: err.message,
+    });
+  }
+};
+
+exports.findProjects = async (req, res) => {
+  try {
+    const searchedProjects = req.query.name;
+    const data = await Project.find({
+      name: { $regex: searchedProjects, $options: 'i' },
+    });
+
+    res.status(200).json({
+      status: 1,
+      results: data.length,
+      data,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 0,
+      message: error.message,
     });
   }
 };
