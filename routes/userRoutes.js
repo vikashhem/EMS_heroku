@@ -10,10 +10,11 @@ router.patch('/updateToken', userController.updateTokenOfUser);
 router.post('/login', userController.userLogin);
 
 router.patch(
-  '/:username',
+  '/updatePhoto/:username',
   userController.uploadProfileImage,
-  //   userController.resizesImages,
-  userController.updateUser
+  userController.updatePhoto
 );
+
+router.patch('/:username', userController.updateUser);
 
 module.exports = router;
