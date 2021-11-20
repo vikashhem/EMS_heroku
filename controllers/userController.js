@@ -75,13 +75,13 @@ exports.userLogin = async (req, res) => {
     // console.log(user);
 
     res.status(200).json({
-      status: 'true',
+      status: true,
       token,
       user,
     });
   } catch (error) {
     res.status(404).json({
-      status: 'false',
+      status: false,
       message: error.message,
     });
   }
