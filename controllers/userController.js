@@ -38,10 +38,11 @@ exports.uploadProfileImage = upload.single('userPhoto');
 
 exports.userSignup = async (req, res) => {
   try {
-    await User.create(req.body);
+    const user = await User.create(req.body);
     res.status(200).json({
       status: true,
       message: 'User successfully created',
+      user,
     });
   } catch (error) {
     res.status(404).json({
@@ -71,10 +72,12 @@ exports.userLogin = async (req, res) => {
       });
     }
     const token = signToken(user._id);
+    // console.log(user);
 
     res.status(200).json({
       status: 'true',
       token,
+      user,
     });
   } catch (error) {
     res.status(404).json({

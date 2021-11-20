@@ -51,6 +51,7 @@ exports.signup = async (req, res) => {
     res.status(200).json({
       status: true,
       token,
+      newAdmin,
       message: 'Admin successfully created',
     });
   } catch (error) {
@@ -84,6 +85,7 @@ exports.login = async (req, res) => {
     res.status(200).json({
       status: 'true',
       token,
+      user,
     });
   } catch (error) {
     res.status(404).json({
