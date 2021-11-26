@@ -51,6 +51,7 @@ exports.signup = async (req, res) => {
     res.status(200).json({
       status: true,
       token,
+      newAdmin,
       message: 'Admin successfully created',
     });
   } catch (error) {
@@ -67,7 +68,7 @@ exports.login = async (req, res) => {
 
     if (!username || !password) {
       res.status(400).json({
-        status: 'false',
+        status: false,
         message: 'Please enter username and password',
       });
     }
@@ -76,18 +77,19 @@ exports.login = async (req, res) => {
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({
-        status: 'false',
+        status: false,
         message: 'Invalid Credentials',
       });
     }
     const token = signToken(user._id);
     res.status(200).json({
-      status: 'true',
+      status: true,
       token,
+      user,
     });
   } catch (error) {
     res.status(404).json({
-      status: 'false',
+      status: false,
       message: error.message,
     });
   }

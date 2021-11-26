@@ -23,8 +23,8 @@ const multerStorage = multer.diskStorage({
 });
 
 const multerFilter = (req, file, cb) => {
-  if (!file.originalname.match(/\.(png|jpg|svg|jpeg|jfif)$/)) {
-    return cb(new Error('Please upload a image with png jpg svg or jpeg'));
+  if (!file) {
+    return cb(new Error('Please upload a image '));
   }
   cb(undefined, true);
 };
@@ -38,10 +38,11 @@ exports.uploadProfileImage = upload.single('userPhoto');
 
 exports.userSignup = async (req, res) => {
   try {
-    await User.create(req.body);
+    const user = await User.create(req.body);
     res.status(200).json({
       status: true,
       message: 'User successfully created',
+      user,
     });
   } catch (error) {
     res.status(404).json({
@@ -71,14 +72,16 @@ exports.userLogin = async (req, res) => {
       });
     }
     const token = signToken(user._id);
+    // console.log(user);
 
     res.status(200).json({
-      status: 'true',
+      status: true,
       token,
+      user,
     });
   } catch (error) {
     res.status(404).json({
-      status: 'false',
+      status: false,
       message: error.message,
     });
   }
@@ -141,26 +144,57 @@ exports.getMyTasks = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const username = req.params.username;
-    // const thingsToBeUpdated = req.body;
+    console.log(username);
+    const user = await User.find({ username });
+    let id;
+    console.log(user);
+
+    user.forEach((element) => {
+      id = element.id;
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runvalidators: true,
+    });
+    // console.log(updatedUser);
+    res.status(200).json({
+      status: true,
+      updatedUser,
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: false,
+      message: error.message,
+    });
+  }
+};
+
+exports.updatePhoto = async (req, res) => {
+  try {
+    const username = req.params.username;
     const user = await User.find({ username });
     let id;
 
     user.forEach((element) => {
       id = element.id;
     });
-    if (req.file) {
-      req.body.userPhoto =
-        'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
+    if (!req.file) {
+      throw new Error('Please upload a image');
     }
+    req.body.userPhoto =
+      'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
 
     const updatedUser = await User.findByIdAndUpdate(id, req.body, {
       new: true,
       runvalidators: true,
     });
 
+    const link = updatedUser.userPhoto;
+
     res.status(201).json({
       status: true,
-      updatedUser,
+      link,
     });
   } catch (error) {
     res.status(404).json({

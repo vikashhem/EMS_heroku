@@ -19,13 +19,6 @@ const upload = multer({
 });
 
 const checkFileType = (file, cb) => {
-  // if (
-  //   !file.originalname.match(
-  //     /\.(png|jpg|svg|jpeg|mp3|mp4|MPEG-4|mkv|pdf|docs)$/
-  //   )
-  // ) {
-  //   return cb(new Error('Please upload a file'));
-  // }
   if (!file) {
     return cb(new Error('Please upload a file'));
   }
