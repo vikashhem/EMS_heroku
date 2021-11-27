@@ -19,10 +19,10 @@ let findRatio = async (project, taskAdded) => {
     //console.log(task.isDeleted);
     if (!task.isDeleted) {
       totalTasks++;
-      if (task.isCompleted && task.isVerified) completedTasks++;
+      if (task.isCompleted /*&& task.isVerified*/) completedTasks++;
     }
   }
-  let ratio = (completedTasks / totalTasks) * 100;
+  let ratio = completedTasks / totalTasks;
   await Project.updateOne(
     {
       _id: project._id,
@@ -143,7 +143,7 @@ exports.createTask = async (req, res) => {
     console.log(curRatio);
     res.status(200).json({
       status: 1,
-      ratio: curRatio,
+      completionRatio: curRatio,
       task,
     });
   } catch (err) {
@@ -157,16 +157,31 @@ exports.createTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const currId = req.params.id;
-    console.log(currId);
+    console.log(req.body);
     // restrict user and admin
     const updatedTask = await Task.findByIdAndUpdate(currId, req.body, {
       new: true,
       runvalidators: true,
     });
     //console.log(updatedTask);
+    // change ratio with isCompleted
+    let check = req.body.isCompleted;
+
+    const project = await Project.find({
+      _id: req.path.split("/")[1],
+      isActive: true,
+    });
+    let curRatio = project[0].completionRatio;
+
+    if (check === true || check === false) {
+      //console.log(project[0]);
+      curRatio = await findRatio(project[0], 0);
+    }
+    console.log(curRatio);
 
     res.status(200).json({
       status: 1,
+      completionRatio: curRatio,
       updatedTask,
     });
   } catch (err) {
