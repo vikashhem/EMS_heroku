@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema({
   userPhoto: {
     type: String,
   },
+  role: {
+    type: String,
+    default: 'user',
+  },
   projects: [
     {
       projectId: {

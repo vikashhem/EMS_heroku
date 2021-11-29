@@ -9,7 +9,7 @@ const adminSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-     unique: true,
+    unique: true,
     required: [true, 'Please provide an username'],
   },
   email: {
@@ -35,8 +35,8 @@ const adminSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
-    default: 'user',
+    // enum: ['user', 'admin'],
+    default: 'admin',
   },
   activation_token: {
     type: String,
@@ -70,14 +70,14 @@ const adminSchema = new mongoose.Schema({
   },
   projects: [
     {
-      projectId:{
+      projectId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
-      projectName:{
-        type:String
+      projectName: {
+        type: String,
       },
-    }
+    },
   ],
 });
 
