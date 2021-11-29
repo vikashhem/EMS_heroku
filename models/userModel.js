@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     ref: "Admin",
   },
+  role: {
+    type: String,
+    default: "user",
+  },
   projects: [
     {
       projectId: {

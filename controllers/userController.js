@@ -256,18 +256,21 @@ exports.updatePhoto = async (req, res) => {
 exports.updateTokenOfUser = async (req, res) => {
   try {
     const { username } = req.body;
+    const { token } = req.body;
     const user = await User.findOne({ username });
     const userId = user.id;
 
     await User.findByIdAndUpdate(
       userId,
       {
-        token: req.body.token,
+        token,
       },
       {
         new: true,
+        runvalidators: true,
       }
     );
+    console.log(token);
     res.status(201).json({
       status: true,
       token,

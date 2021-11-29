@@ -35,8 +35,8 @@ const adminSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["user", "admin"],
-    default: "user",
+    // enum: ['user', 'admin'],
+    default: "admin",
   },
   activation_token: {
     type: String,
