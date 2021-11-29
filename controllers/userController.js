@@ -1,10 +1,11 @@
-const jwt = require('jsonwebtoken');
-const multer = require('multer');
-const path = require('path');
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
 // const sharp = require('sharp');
-const bcrypt = require('bcryptjs');
-const User = require('../models/userModel');
-const Task = require('../models/taskModel');
+const bcrypt = require("bcryptjs");
+const Admin = require("../models/adminModel");
+const User = require("../models/userModel");
+const Task = require("../models/taskModel");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -15,7 +16,7 @@ const signToken = (id) => {
 const multerStorage = multer.diskStorage({
   // Destination to store image
   destination: (req, file, cb) => {
-    cb(null, 'data');
+    cb(null, "data");
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -24,7 +25,7 @@ const multerStorage = multer.diskStorage({
 
 const multerFilter = (req, file, cb) => {
   if (!file) {
-    return cb(new Error('Please upload a image '));
+    return cb(new Error("Please upload a image "));
   }
   cb(undefined, true);
 };
@@ -34,14 +35,38 @@ const upload = multer({
   fileFilter: multerFilter,
 });
 
-exports.uploadProfileImage = upload.single('userPhoto');
+exports.uploadProfileImage = upload.single("userPhoto");
 
 exports.userSignup = async (req, res) => {
   try {
+    console.log(req.body.companyId);
+    const admin = await Admin.findById(req.body.companyId);
+    console.log(admin);
+    if (!admin) {
+      res.status(404).json({
+        status: 0,
+        message: "No such company exists",
+      });
+      return;
+    }
     const user = await User.create(req.body);
+    console.log(user);
+    await Admin.updateOne(
+      {
+        _id: admin._id,
+      },
+      {
+        $push: {
+          employees: {
+            employeeId: user._id,
+            employeeName: user.username,
+          },
+        },
+      }
+    );
     res.status(200).json({
       status: true,
-      message: 'User successfully created',
+      message: "User successfully created",
       user,
     });
   } catch (error) {
@@ -59,7 +84,7 @@ exports.userLogin = async (req, res) => {
     if (!username || !password) {
       res.status(400).json({
         status: false,
-        message: 'Please enter username and password',
+        message: "Please enter username and password",
       });
     }
 
@@ -68,7 +93,7 @@ exports.userLogin = async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({
         status: false,
-        message: 'Invalid Credentials',
+        message: "Invalid Credentials",
       });
     }
     const token = signToken(user._id);
@@ -89,7 +114,19 @@ exports.userLogin = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const admin = await Admin.find({ username: req.query.username });
+
+    console.log(admin[0]);
+    if (!admin.length) {
+      res.status(404).json({
+        status: 0,
+        message: "No such admin exists",
+      });
+      return;
+    }
+    const users = await User.find({
+      companyId: admin[0]._id,
+    });
     res.status(200).json({
       status: true,
       users,
@@ -107,24 +144,36 @@ exports.getMyTasks = async (req, res) => {
     const checkUser = await User.find({
       username: req.query.username,
     });
-    if (!checkUser.length) {
+    const checkAdmin = await Admin.find({
+      username: req.query.username,
+    });
+    if (!checkUser.length && !checkAdmin.length) {
       res.status(403).json({
         status: false,
-        message: 'No such User exists',
+        message: "No such User exists",
       });
       return;
     }
-    const users = await Task.find({
-      assignedTo: req.query.username,
-      isDeleted: false,
-    }).sort({ dueDate: -1 });
+    let users;
+    if (checkAdmin.length) {
+      users = await Task.find({
+        assignedBy: req.query.username,
+        isDeleted: false,
+      }).sort({ dueDate: -1 });
+    } else {
+      users = await Task.find({
+        assignedTo: req.query.username,
+        isDeleted: false,
+      }).sort({ dueDate: -1 });
+    }
+
     //check if user exists
     //send only non deleted tasks
     //console.log(users);
     if (!users.length) {
       res.status(403).json({
         status: false,
-        message: 'No Task exists',
+        message: "No Task exists",
       });
       return;
     }
@@ -180,10 +229,10 @@ exports.updatePhoto = async (req, res) => {
       id = element.id;
     });
     if (!req.file) {
-      throw new Error('Please upload a image');
+      throw new Error("Please upload a image");
     }
     req.body.userPhoto =
-      'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
+      "https://ems-heroku.herokuapp.com/data/" + req.file.originalname;
 
     const updatedUser = await User.findByIdAndUpdate(id, req.body, {
       new: true,

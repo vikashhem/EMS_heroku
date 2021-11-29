@@ -59,7 +59,7 @@ exports.getAllProjects = async (req, res) => {
     console.log(username);
     // what if admin and user have same username
     const user = await User.find({ username: username });
-    const admin = await Admin.find({ username: username });
+    const admin = await Admin.find({ username: username /*role:hj */ });
     if (!user.length && !admin.length) {
       res.status(400).json({
         status: 1,

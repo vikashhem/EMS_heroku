@@ -33,7 +33,7 @@ let findRatio = async (project, taskAdded) => {
       },
     }
   );
-  //console.log(project);
+  console.log(project);
   console.log(totalTasks);
   console.log(ratio);
   return ratio;
