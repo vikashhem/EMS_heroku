@@ -32,10 +32,6 @@ exports.signup = async (req, res) => {
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
       role: req.body.role,
-      // activation_token: checkActivationToken(
-      //   req.body.role,
-      //   req.body.activation_token
-      // ),
       activation_token: req.body.activation_token,
       phoneNumber: req.body.phoneNumber,
       companyName: req.body.companyName,
