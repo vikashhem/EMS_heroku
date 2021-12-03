@@ -111,18 +111,6 @@ exports.userLogin = async (req, res) => {
     });
   }
 };
-
-// exports.forgotPassword = async(req,res)=>{
-//   const user= await User.findOne({email:req.body.email});
-
-//   if(!user){
-//     res.status(404).json({
-//       status: false,
-//       message:'Email id doesn't exists.'
-//     })
-//   }
-// }
-
 exports.getAllUsers = async (req, res) => {
   try {
     const admin = await Admin.find({ username: req.query.username });

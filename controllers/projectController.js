@@ -216,11 +216,11 @@ exports.addUser = async (req, res) => {
           },
         }
       );
-      //comment: Notification for adding User to project.
 
+      //comment: Notification for adding User to project.
       const token = user.token;
       const title = project.name;
-      const message = 'You have been added to the project. -';
+      const message = 'You have been added to the project';
       console.log(message);
 
       const messageToBeSent = NotificationTitle(title, 'Project', message);

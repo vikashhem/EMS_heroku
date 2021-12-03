@@ -53,8 +53,6 @@ exports.createTask = async (req, res) => {
       _id: req.path.split('/')[1],
       isActive: true,
     });
-    // console.log(project[0]);
-    //console.log(user1);
     if (!user1.length) {
       res.status(403).json({
         status: false,
@@ -143,8 +141,6 @@ exports.createTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const currId = req.params.id;
-    // console.log(req.body);
-    // restrict user and admin
     const updatedTask = await Task.findByIdAndUpdate(currId, req.body, {
       new: true,
       runvalidators: true,
@@ -158,18 +154,28 @@ exports.updateTask = async (req, res) => {
     let curRatio = project[0].completionRatio;
 
     if (check === true || check === false) {
-      //console.log(project[0]);
       curRatio = await findRatio(project[0], 0);
     }
-    // console.log(curRatio);
+
     //comment: for notification when the task is updated
-    const user = await User.find({ username: updatedTask.assignedTo });
+
+    let user, message;
+
+    if (req.body.assignedTo) {
+      const username = req.body.assignedTo;
+      user = await User.find({ username });
+      message = 'Task has been assigned to you.';
+    } else {
+      user = await User.find({ username: updatedTask.assignedTo });
+      message = 'Task has been updated.';
+    }
+
     const admin = await Admin.find({ username: updatedTask.assignedBy });
+    console.log(message);
 
     let tokens = [];
-    tokens.push(findToken(user), findToken(admin));
-
-    const message = 'Task has been updated.';
+    tokens.push(findToken(user));
+    tokens.push(findToken(admin));
 
     const MessageToBeSent = NotificationTitle(
       updatedTask.taskname,
