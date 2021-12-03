@@ -1,9 +1,12 @@
+// let tokens = [];
+let token;
 
-
-exports.findToken=(user)=>{
-    const token;
-  user.forEach((element) => {
-      token = element.token;
-    });
-    return token;
+const findToken = (element) => {
+  element.forEach((x) => {
+    // tokens.push(x.token);
+    token = x.token;
+  });
+  return token;
 };
+
+module.exports = findToken;

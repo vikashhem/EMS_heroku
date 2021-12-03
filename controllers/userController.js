@@ -1,11 +1,11 @@
-const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const path = require("path");
-// const sharp = require('sharp');
-const bcrypt = require("bcryptjs");
-const Admin = require("../models/adminModel");
-const User = require("../models/userModel");
-const Task = require("../models/taskModel");
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+const bcrypt = require('bcryptjs');
+const User = require('../models/userModel');
+const Admin = require('../models/adminModel');
+const Task = require('../models/taskModel');
+// const updateToken = require('../utils/updateToken');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -16,7 +16,7 @@ const signToken = (id) => {
 const multerStorage = multer.diskStorage({
   // Destination to store image
   destination: (req, file, cb) => {
-    cb(null, "data");
+    cb(null, 'data');
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -25,7 +25,7 @@ const multerStorage = multer.diskStorage({
 
 const multerFilter = (req, file, cb) => {
   if (!file) {
-    return cb(new Error("Please upload a image "));
+    return cb(new Error('Please upload a image '));
   }
   cb(undefined, true);
 };
@@ -35,22 +35,22 @@ const upload = multer({
   fileFilter: multerFilter,
 });
 
-exports.uploadProfileImage = upload.single("userPhoto");
+exports.uploadProfileImage = upload.single('userPhoto');
 
 exports.userSignup = async (req, res) => {
   try {
     console.log(req.body.companyId);
     const admin = await Admin.findById(req.body.companyId);
-    console.log(admin);
+    // console.log(admin);
     if (!admin) {
       res.status(404).json({
         status: 0,
-        message: "No such company exists",
+        message: 'No such company exists',
       });
       return;
     }
     const user = await User.create(req.body);
-    console.log(user);
+    // console.log(user);
     await Admin.updateOne(
       {
         _id: admin._id,
@@ -66,7 +66,7 @@ exports.userSignup = async (req, res) => {
     );
     res.status(200).json({
       status: true,
-      message: "User successfully created",
+      message: 'User successfully created',
       user,
     });
   } catch (error) {
@@ -84,7 +84,7 @@ exports.userLogin = async (req, res) => {
     if (!username || !password) {
       res.status(400).json({
         status: false,
-        message: "Please enter username and password",
+        message: 'Please enter username and password',
       });
     }
 
@@ -93,7 +93,7 @@ exports.userLogin = async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({
         status: false,
-        message: "Invalid Credentials",
+        message: 'Invalid Credentials',
       });
     }
     const token = signToken(user._id);
@@ -112,6 +112,17 @@ exports.userLogin = async (req, res) => {
   }
 };
 
+// exports.forgotPassword = async(req,res)=>{
+//   const user= await User.findOne({email:req.body.email});
+
+//   if(!user){
+//     res.status(404).json({
+//       status: false,
+//       message:'Email id doesn't exists.'
+//     })
+//   }
+// }
+
 exports.getAllUsers = async (req, res) => {
   try {
     const admin = await Admin.find({ username: req.query.username });
@@ -120,7 +131,7 @@ exports.getAllUsers = async (req, res) => {
     if (!admin.length) {
       res.status(404).json({
         status: 0,
-        message: "No such admin exists",
+        message: 'No such admin exists',
       });
       return;
     }
@@ -150,7 +161,7 @@ exports.getMyTasks = async (req, res) => {
     if (!checkUser.length && !checkAdmin.length) {
       res.status(403).json({
         status: false,
-        message: "No such User exists",
+        message: 'No such User exists',
       });
       return;
     }
@@ -173,7 +184,7 @@ exports.getMyTasks = async (req, res) => {
     if (!users.length) {
       res.status(403).json({
         status: false,
-        message: "No Task exists",
+        message: 'No Task exists',
       });
       return;
     }
@@ -229,10 +240,10 @@ exports.updatePhoto = async (req, res) => {
       id = element.id;
     });
     if (!req.file) {
-      throw new Error("Please upload a image");
+      throw new Error('Please upload a image');
     }
     req.body.userPhoto =
-      "https://ems-heroku.herokuapp.com/data/" + req.file.originalname;
+      'https://ems-heroku.herokuapp.com/data/' + req.file.originalname;
 
     const updatedUser = await User.findByIdAndUpdate(id, req.body, {
       new: true,
@@ -253,23 +264,33 @@ exports.updatePhoto = async (req, res) => {
   }
 };
 
+const updateToken = async (model, id, token) => {
+  await model.findByIdAndUpdate(
+    id,
+    {
+      token,
+    },
+    {
+      new: true,
+      runvalidators: true,
+    }
+  );
+};
+
 exports.updateTokenOfUser = async (req, res) => {
   try {
-    const { username } = req.body;
+    let username = req.body.username;
     const { token } = req.body;
     const user = await User.findOne({ username });
-    const userId = user.id;
 
-    await User.findByIdAndUpdate(
-      userId,
-      {
-        token,
-      },
-      {
-        new: true,
-        runvalidators: true,
-      }
-    );
+    if (user) {
+      updateToken(User, user.id, token);
+    } else {
+      const admin = await Admin.findOne({ username });
+      const adminId = admin.id;
+      updateToken(Admin, adminId, token);
+    }
+
     console.log(token);
     res.status(201).json({
       status: true,

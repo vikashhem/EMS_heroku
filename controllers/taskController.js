@@ -1,14 +1,14 @@
-const admin = require("firebase-admin");
-const serviceAccount = require("../key.json");
-const Project = require("../models/projectModel");
-const Task = require("../models/taskModel");
-const User = require("../models/userModel");
-const Admin = require("../models/adminModel");
-const notification = require("./chatController");
+const Project = require('../models/projectModel');
+const Task = require('../models/taskModel');
+const User = require('../models/userModel');
+const Admin = require('../models/adminModel');
+const notification = require('./chatController');
+const findToken = require('../utils/findToken');
+const NotificationTitle = require('../utils/notificationTitle');
 
 let findRatio = async (project, taskAdded) => {
   if (!project.isActive) return;
-  console.log("in Find Ratio");
+  console.log('in Find Ratio');
   let totalTasks = taskAdded;
   let completedTasks = 0;
   const tasks = project.tasks;
@@ -39,18 +39,6 @@ let findRatio = async (project, taskAdded) => {
   return ratio;
 };
 
-const NotificationTitle = (task) => {
-  return {
-    notification: {
-      title: `${task}`,
-      body: "Task has been assigned.",
-    },
-    data: {
-      type: "task",
-    },
-  };
-};
-
 exports.createTask = async (req, res) => {
   try {
     const user1 = await User.find({
@@ -60,30 +48,31 @@ exports.createTask = async (req, res) => {
     const admin = await Admin.find({
       username: req.body.assignedBy,
     });
+    console.log(admin);
     const project = await Project.find({
-      _id: req.path.split("/")[1],
+      _id: req.path.split('/')[1],
       isActive: true,
     });
-    console.log(project[0]);
+    // console.log(project[0]);
     //console.log(user1);
     if (!user1.length) {
       res.status(403).json({
         status: false,
-        message: "No such user exists",
+        message: 'No such user exists',
       });
       return;
     }
     if (!admin.length) {
       res.status(403).json({
         status: false,
-        message: "No such admin exists",
+        message: 'No such admin exists',
       });
       return;
     }
     if (!project.length) {
       res.status(403).json({
         status: false,
-        message: "No such project exists",
+        message: 'No such project exists',
       });
       return;
     }
@@ -92,20 +81,17 @@ exports.createTask = async (req, res) => {
       token = element.token;
     });
     if (!token) {
-      throw new Error("No token found");
+      throw new Error('No token found');
     }
-    console.log(token);
+    let message = 'Task has been assigned to you.';
 
-    const notification_options = {
-      priority: "high",
-      timeToLive: 60 * 60 * 24,
-    };
-    const options = notification_options;
+    const MessageToBeSent = NotificationTitle(
+      req.body.taskname,
+      'Task',
+      message
+    );
 
-    const MessageToBeSent = NotificationTitle(req.body.taskname);
-    console.log(MessageToBeSent);
-
-    notification.notificationOverall(token, MessageToBeSent, options);
+    notification.notificationOverall(token, MessageToBeSent);
 
     const task = await Task.create({
       taskname: req.body.taskname,
@@ -140,7 +126,7 @@ exports.createTask = async (req, res) => {
     //console.log(project);
     //console.log(project[0].tasks);
     let curRatio = await findRatio(project[0], 1);
-    console.log(curRatio);
+    // console.log(curRatio);
     res.status(200).json({
       status: 1,
       completionRatio: curRatio,
@@ -157,18 +143,16 @@ exports.createTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const currId = req.params.id;
-    console.log(req.body);
+    // console.log(req.body);
     // restrict user and admin
     const updatedTask = await Task.findByIdAndUpdate(currId, req.body, {
       new: true,
       runvalidators: true,
     });
-    //console.log(updatedTask);
-    // change ratio with isCompleted
     let check = req.body.isCompleted;
 
     const project = await Project.find({
-      _id: req.path.split("/")[1],
+      _id: req.path.split('/')[1],
       isActive: true,
     });
     let curRatio = project[0].completionRatio;
@@ -177,7 +161,23 @@ exports.updateTask = async (req, res) => {
       //console.log(project[0]);
       curRatio = await findRatio(project[0], 0);
     }
-    console.log(curRatio);
+    // console.log(curRatio);
+    //comment: for notification when the task is updated
+    const user = await User.find({ username: updatedTask.assignedTo });
+    const admin = await Admin.find({ username: updatedTask.assignedBy });
+
+    let tokens = [];
+    tokens.push(findToken(user), findToken(admin));
+
+    const message = 'Task has been updated.';
+
+    const MessageToBeSent = NotificationTitle(
+      updatedTask.taskname,
+      'Task',
+      message
+    );
+
+    notification.notificationOverall(tokens, MessageToBeSent);
 
     res.status(200).json({
       status: 1,
@@ -193,7 +193,7 @@ exports.updateTask = async (req, res) => {
 };
 
 exports.verifyTask = async (req, res) => {
-  //admin check ?
+  //comment: admin check ?
   try {
     const currId = req.params.id;
     const task = await Task.find({ _id: currId, isDeleted: false });
@@ -201,7 +201,7 @@ exports.verifyTask = async (req, res) => {
     if (!task.length) {
       res.status(403).json({
         status: false,
-        message: "No such task exists",
+        message: 'No such task exists',
       });
       return;
     }
@@ -209,7 +209,7 @@ exports.verifyTask = async (req, res) => {
     if (!task[0].isCompleted) {
       res.status(403).json({
         status: false,
-        message: "Task is not completed by user",
+        message: 'Task is not completed by user',
       });
       return;
     }
@@ -224,7 +224,7 @@ exports.verifyTask = async (req, res) => {
     //console.log(task[0].projectId);
     //console.log(req.path.split("/")[1]);
     const project = await Project.find({
-      _id: req.path.split("/")[1],
+      _id: req.path.split('/')[1],
       isActive: true,
     });
 
@@ -249,7 +249,6 @@ exports.getAllTasks = async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
     const tasks = project.tasks;
-    //console.log(tasks);
     console.log(project);
 
     let allTasks = [];
@@ -302,7 +301,7 @@ exports.deleteTask = async (req, res) => {
     );
     res.status(200).json({
       status: 1,
-      message: "Successfully deleted",
+      message: 'Successfully deleted',
     });
   } catch (err) {
     res.status(400).json({

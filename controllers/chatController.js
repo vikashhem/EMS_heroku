@@ -7,8 +7,12 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-exports.notificationOverall = (registrationToken, MessageToBeSent, options) => {
+exports.notificationOverall = (registrationToken, MessageToBeSent) => {
   if (registrationToken != null) {
+    const options = {
+      priority: 'high',
+      timeToLive: 60 * 60 * 24,
+    };
     admin
       .messaging()
       .sendToDevice(registrationToken, MessageToBeSent, options)
