@@ -3,6 +3,8 @@ const Admin = require('../models/adminModel');
 const User = require('../models/userModel');
 const NotificationTitle = require('../utils/notificationTitle');
 const NotificationFromProject = require('./chatController');
+const catchAsync = require('./../utils/catchAsync');
+const AppError = require('./../utils/appError');
 
 exports.createProject = async (req, res) => {
   try {
@@ -94,20 +96,16 @@ exports.getAllProjects = async (req, res) => {
   }
 };
 
-exports.getProject = async (req, res) => {
-  try {
-    const project = await Project.find({ _id: req.params.id, isActive: true });
-    res.status(200).json({
-      status: 1,
-      project,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: 0,
-      message: err.message,
-    });
+exports.getProject = catchAsync(async (req, res, next) => {
+  const project = await Project.find({ _id: req.params.id, isActive: true });
+  if (project.length === 0) {
+    return next(new AppError(`Can't find the project with given ID`, 404));
   }
-};
+  res.status(200).json({
+    status: true,
+    project,
+  });
+});
 
 exports.updateProject = async (req, res) => {
   try {

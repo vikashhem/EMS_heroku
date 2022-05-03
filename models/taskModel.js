@@ -1,19 +1,19 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema(
   {
     taskname: {
       type: String,
-      required: [true, " Please provide a project name"],
+      required: [true, ' Please provide a project name'],
       trim: true,
     },
     assignedBy: {
       type: String,
-      required: [true, " Please provide owner name"],
+      required: [true, ' Please provide owner name'],
     },
     assignedTo: {
       type: String,
-      required: [true, " Please provide a user name"],
+      required: [true, ' Please provide a user name'],
     },
     dueDate: {
       type: Date,
@@ -57,14 +57,14 @@ const taskSchema = new mongoose.Schema(
     },
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Project",
+      ref: 'Project',
     },
     projectName: {
       type: String,
     },
   },
-  { timestamps: { createdAt: "created_at" } }
+  { timestamps: { createdAt: 'created_at' } }
 );
 
-const Task = mongoose.model("Task", taskSchema);
+const Task = mongoose.model('Task', taskSchema);
 module.exports = Task;

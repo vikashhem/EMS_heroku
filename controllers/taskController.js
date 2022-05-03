@@ -159,23 +159,18 @@ exports.updateTask = async (req, res) => {
 
     //comment: for notification when the task is updated
 
-    let user, message;
-
-    if (req.body.assignedTo) {
-      const username = req.body.assignedTo;
-      user = await User.find({ username });
-      message = 'Task has been assigned to you.';
-    } else {
-      user = await User.find({ username: updatedTask.assignedTo });
-      message = 'Task has been updated.';
-    }
+    let tokens = [];
+    const message = 'Task has been updated.';
+    const user = await User.find({ username: updatedTask.assignedTo });
 
     const admin = await Admin.find({ username: updatedTask.assignedBy });
     console.log(message);
 
-    let tokens = [];
-    tokens.push(findToken(user));
-    tokens.push(findToken(admin));
+    tokens.push(findToken(user), findToken(admin));
+
+    tokens.forEach(function (el) {
+      console.log(el);
+    });
 
     const MessageToBeSent = NotificationTitle(
       updatedTask.taskname,

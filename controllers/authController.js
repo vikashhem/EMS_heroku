@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
-const Admin = require('../models/adminModel');
 const bcrypt = require('bcryptjs');
+const Admin = require('../models/adminModel');
+const User = require('../models/userModel');
+const checkUserName = require('../utils/checkUsername');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET_KEY, {
@@ -25,23 +27,37 @@ const checkActivationToken = (role, token) => {
 
 exports.signup = async (req, res) => {
   try {
-    const newAdmin = await Admin.create({
-      name: req.body.name,
-      username: req.body.username,
-      email: req.body.email,
-      password: req.body.password,
-      passwordConfirm: req.body.passwordConfirm,
-      role: req.body.role,
-      activation_token: req.body.activation_token,
-      phoneNumber: req.body.phoneNumber,
-      companyName: req.body.companyName,
-      companyEmail: req.body.companyEmail,
-      companyNumber: req.body.companyNumber,
-      companyDescription: req.body.companyDescription,
-      address: req.body.address,
-    });
+    const username = req.body.username;
+    let newAdmin;
+    if (checkUserName(User, username)) {
+      newAdmin = await Admin.create(req.body);
+    } else {
+      return new Error('Username already in use.');
+    }
 
-    console.log(req.body.activation_token);
+    // if(checkUserName(User,username)) {
+    //   const newAdmin= await Admin.create({ req.body})
+
+    // }
+
+    // const newAdmin = await Admin.create({
+    //   name: req.body.name,
+    //   // username: checkUserName(User, username),
+    //   username: username,
+    //   email: req.body.email,
+    //   password: req.body.password,
+    //   passwordConfirm: req.body.passwordConfirm,
+    //   role: req.body.role,
+    //   activation_token: req.body.activation_token,
+    //   phoneNumber: req.body.phoneNumber,
+    //   companyName: req.body.companyName,
+    //   companyEmail: req.body.companyEmail,
+    //   companyNumber: req.body.companyNumber,
+    //   companyDescription: req.body.companyDescription,
+    //   address: req.body.address,
+    // });
+
+    // console.log(req.body.activation_token);
 
     const token = signToken(newAdmin._id);
 

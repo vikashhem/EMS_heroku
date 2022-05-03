@@ -5,9 +5,6 @@ const dotenv = require('dotenv');
 const id = process.env.ALGOLIA_APPLICATION_ID;
 const apiKey = process.env.ALGOLIA_ADMIN_API_KEY;
 
-const client = algoliasearch('id', 'apiKey');
-const algoliaIndex = client.initIndex('users');
-// const express = require('express');
 const app = require('./app');
 
 dotenv.config({ path: './config.env' });
@@ -39,4 +36,3 @@ app.listen(port, () => {
 });
 
 module.exports = port;
-module.exports = algoliaIndex;

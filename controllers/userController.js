@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const Admin = require('../models/adminModel');
 const Task = require('../models/taskModel');
+const catchAsync = require('./../utils/catchAsync');
+const AppError = require('./../utils/appError');
 // const updateToken = require('../utils/updateToken');
 
 const signToken = (id) => {
@@ -37,45 +39,34 @@ const upload = multer({
 
 exports.uploadProfileImage = upload.single('userPhoto');
 
-exports.userSignup = async (req, res) => {
-  try {
-    console.log(req.body.companyId);
-    const admin = await Admin.findById(req.body.companyId);
-    // console.log(admin);
-    if (!admin) {
-      res.status(404).json({
-        status: 0,
-        message: 'No such company exists',
-      });
-      return;
-    }
-    const user = await User.create(req.body);
-    // console.log(user);
-    await Admin.updateOne(
-      {
-        _id: admin._id,
-      },
-      {
-        $push: {
-          employees: {
-            employeeId: user._id,
-            employeeName: user.username,
-          },
-        },
-      }
-    );
-    res.status(200).json({
-      status: true,
-      message: 'User successfully created',
-      user,
-    });
-  } catch (error) {
-    res.status(404).json({
-      status: false,
-      message: error.message,
-    });
+exports.userSignup = catchAsync(async (req, res, next) => {
+  // console.log(req.body.companyId);
+  const admin = await Admin.findById(req.body.companyId);
+  // console.log(admin);
+  if (!admin) {
+    return next(AppError('No such company id exist', 400));
   }
-};
+  const user = await User.create(req.body);
+  // console.log(user);
+  await Admin.updateOne(
+    {
+      _id: admin._id,
+    },
+    {
+      $push: {
+        employees: {
+          employeeId: user._id,
+          employeeName: user.username,
+        },
+      },
+    }
+  );
+  res.status(200).json({
+    status: true,
+    message: 'User successfully created',
+    user,
+  });
+});
 
 exports.userLogin = async (req, res) => {
   try {
@@ -113,19 +104,20 @@ exports.userLogin = async (req, res) => {
 };
 exports.getAllUsers = async (req, res) => {
   try {
-    const admin = await Admin.find({ username: req.query.username });
+    // const admin = await Admin.find({ username: req.query.username });
 
-    console.log(admin[0]);
-    if (!admin.length) {
-      res.status(404).json({
-        status: 0,
-        message: 'No such admin exists',
-      });
-      return;
-    }
-    const users = await User.find({
-      companyId: admin[0]._id,
-    });
+    // console.log(admin[0]);
+    // if (!admin.length) {
+    //   res.status(404).json({
+    //     status: 0,
+    //     message: 'No such admin exists',
+    //   });
+    //   return;
+    // }
+    // const users = await User.find({
+    //   companyId: admin[0]._id,
+    // });
+    const users = await User.find();
     res.status(200).json({
       status: true,
       users,
