@@ -60,7 +60,7 @@ exports.createProject = async (req, res) => {
 exports.getAllProjects = async (req, res) => {
   try {
     const username = req.query.username;
-    console.log(username);
+    // console.log(username);
     // what if admin and user have same username
     const user = await User.find({ username: username });
     const admin = await Admin.find({ username: username /*role:hj */ });
